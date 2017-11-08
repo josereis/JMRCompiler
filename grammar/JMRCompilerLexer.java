@@ -1,4 +1,4 @@
-package grammar;
+package JMRCompiler.grammar;
 
 // Generated from JMRCompiler.g4 by ANTLR 4.7
 
