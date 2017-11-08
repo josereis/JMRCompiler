@@ -1,0 +1,13 @@
+Class exem;
+Int: a, b, c, d;
+final Int e = 5;
+final Str f = 5;
+final Int g = 5.521;
+final Float h = 10;
+final Str i = "algo";
+final Bool j = false;
+final Bool k = "true";
+
+Main {
+	print("");
+}
