@@ -11,42 +11,51 @@ grammar JMRCompiler;
         Map<String, ObjectSymbolTable> SymbolTable = new HashMap<String, ObjectSymbolTable>();
 }
 
-programa: 'Class' ID ';' (decVars|decConsts|decFuncs)* main 
+programa: 'Class' ID ';' decVars* decConsts* decFuncs* main 
     ;
-decVars: tipo ':' listaIDs[$tipo.t] ';'
+decVars: tipo ':' listaIDs[$tipo.type] ';'
        ;
-tipo returns [int t]: 'Int' {$t = 1;} 
-    | 'Str' {$t = 2;}
-    | 'Bool' {$t = 3;} 
-    | 'Float' {$t = 4;} 
+tipo returns [int type]: 'Int' {$type = 1;}
+	| 'Float' {$type = 2;} 
+    | 'Str' {$type = 3;}
+    | 'Bool' {$type = 4;}  
     ;
-listaIDs[int t]: ID (',' ID)*
+    
+tipoF returns [int type]: tipo {$type = $tipo.type;}
+	| 'Void' {$type = 0;}    
+    ;
+    
+listaIDs[int type]: ID (',' ID)*
         ;
 
 listaIDs2: ID (',' ID)*
         ;
 decConsts: 'final' tipo ID Tk_Eq valor ';'
          ;
-valor: INT 
-     | REAL 
-     | STRING 
-     | BOOLEAN 
+valor returns [Object value]: INT {$value = Integer.parseInt($INT.text);}
+     | REAL {$value = Float.parseFloat($REAL.text);}
+     | STRING {$value = $STRING.text;}
+     | BOOLEAN {
+     			if(($BOOLEAN.text).equals("true"))
+     				$value = true;
+     			else
+     				$value = false;
+     			}
      ;
 
-decFuncs: (tipo|'Void') ID '(' lista_parametros ')' '{' (comandos|decVars|decConsts)+ '}'
+decFuncs: tipoF ID '(' lista_parametros ')' '{' decVars* decConsts* comandos+ '}'
         ;
 
 lista_parametros: tipo ID (',' tipo ID)*
                 ;
 
-main: 'Main' '{' (comandos|decVars|decConsts)+ '}'
+main: 'Main' '{' comandos+ '}'
     ;
 
 comandos: 'if' '(' bool ')' '{'comandos+'}' ('else' '{'comandos+'}')?
         | 'for' '(' atrib bool ';' bool ')' '{' comandos*'}'
-        | decConsts
         | atrib
-        | bool ';'
+        | funcao
         | print
         | read
         | 'break' ';'
@@ -86,15 +95,10 @@ expr: expr '+' term
     | term
     ;
 
-term: term '*' term2
-    | term '/' term2
-    | term2
+term: term '*' unary
+    | term '/' unary
+    | unary
     ;
-
-term2: unary '++'
-     | unary '--'
-     | unary
-     ;
 
 unary: '!' factor
      | '-' factor
