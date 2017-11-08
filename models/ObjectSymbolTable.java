@@ -1,5 +1,8 @@
 package models;
 
+/**
+ * @author José Reis R Santiago 
+ */
 public class ObjectSymbolTable {
 	// DECLARAÇÃO DE CONSTANTES A SEREM USADAS PARA INDENTIFICAÇÃO DO OBJETO A SER SALVO NA TABELA DE SIMBOLOS
 	static final int VARIABLE = 1, CONSTANT = 2, FUNCTION = 3, PARAMETER = 4;
@@ -8,6 +11,7 @@ public class ObjectSymbolTable {
 	private int type;
 	private int memoryAddress;
 	private int typeObjectSimbolTable;
+	private Object valueObject;
 	
 	public int getType() {
 		return type;
@@ -32,11 +36,20 @@ public class ObjectSymbolTable {
 	public void setTypeObjectSimbolTable(int typeObjectSimbolTable) {
 		this.typeObjectSimbolTable = typeObjectSimbolTable;
 	}
+
+	public Object getValueObject() {
+		return valueObject;
+	}
+
+	public void setValueObject(Object valueObject) {
+		this.valueObject = valueObject;
+	}
 	
-	public ObjectSymbolTable(int memoryAddress, int type, int typeObjectSimbolTable) {
+	public ObjectSymbolTable(int memoryAddress, int type, int typeObjectSimbolTable, Object valueObject) {
 		this.typeObjectSimbolTable = typeObjectSimbolTable;
 		this.type = type;
 		this.memoryAddress = memoryAddress;
+		this.valueObject = valueObject;
 	}
 	
 }
