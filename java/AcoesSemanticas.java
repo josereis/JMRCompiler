@@ -1,12 +1,10 @@
-package JMRCompiler.java;
+package java;
 
 
 import java.util.HashMap;
 import java.util.Map;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import JMRCompiler.grammar.JMRCompilerBaseListener;
-import JMRCompiler.grammar.JMRCompilerBaseListener;
-import JMRCompiler.grammar.JMRCompilerParser;
+import grammar.*;
 
 public class AcoesSemanticas extends JMRCompilerBaseListener {
     

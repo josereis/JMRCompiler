@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package JMRCompiler.java;
+package java;
 
-import JMRCompiler.java.AcoesSemanticas;
+import java.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,8 +14,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import JMRCompiler.grammar.JMRCompilerLexer;
-import JMRCompiler.grammar.JMRCompilerParser;
+import grammar.*;
 
 /**
  *
