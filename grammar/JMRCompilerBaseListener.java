@@ -1,5 +1,6 @@
 package grammar;
 
+
 // Generated from JMRCompiler.g4 by ANTLR 4.7
 
         import java.util.HashMap;
