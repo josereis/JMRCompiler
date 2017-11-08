@@ -59,6 +59,18 @@ public class JMRCompilerBaseListener implements JMRCompilerListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterTipoF(JMRCompilerParser.TipoFContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTipoF(JMRCompilerParser.TipoFContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterListaIDs(JMRCompilerParser.ListaIDsContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -246,18 +258,6 @@ public class JMRCompilerBaseListener implements JMRCompilerListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitTerm(JMRCompilerParser.TermContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterTerm2(JMRCompilerParser.Term2Context ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitTerm2(JMRCompilerParser.Term2Context ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

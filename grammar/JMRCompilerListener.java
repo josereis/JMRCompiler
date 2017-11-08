@@ -45,6 +45,16 @@ public interface JMRCompilerListener extends ParseTreeListener {
 	 */
 	void exitTipo(JMRCompilerParser.TipoContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link JMRCompilerParser#tipoF}.
+	 * @param ctx the parse tree
+	 */
+	void enterTipoF(JMRCompilerParser.TipoFContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link JMRCompilerParser#tipoF}.
+	 * @param ctx the parse tree
+	 */
+	void exitTipoF(JMRCompilerParser.TipoFContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link JMRCompilerParser#listaIDs}.
 	 * @param ctx the parse tree
 	 */
@@ -204,16 +214,6 @@ public interface JMRCompilerListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitTerm(JMRCompilerParser.TermContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link JMRCompilerParser#term2}.
-	 * @param ctx the parse tree
-	 */
-	void enterTerm2(JMRCompilerParser.Term2Context ctx);
-	/**
-	 * Exit a parse tree produced by {@link JMRCompilerParser#term2}.
-	 * @param ctx the parse tree
-	 */
-	void exitTerm2(JMRCompilerParser.Term2Context ctx);
 	/**
 	 * Enter a parse tree produced by {@link JMRCompilerParser#unary}.
 	 * @param ctx the parse tree
