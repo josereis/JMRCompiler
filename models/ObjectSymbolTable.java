@@ -2,7 +2,7 @@ package models;
 
 public class ObjectSymbolTable {
 	// DECLARAÇÃO DE CONSTANTES A SEREM USADAS PARA INDENTIFICAÇÃO DO OBJETO A SER SALVO NA TABELA DE SIMBOLOS
-	static final int VARIABLE = 1, CONSTANT = 2, FUNCTION = 3;
+	static final int VARIABLE = 1, CONSTANT = 2, FUNCTION = 3, PARAMETER = 4;
 	static final int VOID = 0, INT = 1, FLOAT = 2, STRING = 3, BOOL = 4;
 	
 	private int type;
