@@ -41,7 +41,7 @@ public class TrabFinal {
         walker.walk(listener, tree);
         
         System.out.println("Tabela de Simbolos");
-        System.out.println(listener.getTabSimb());
+        System.out.println(listener.getSymbolTable());
         
         
         
