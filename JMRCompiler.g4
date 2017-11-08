@@ -3,10 +3,12 @@ grammar JMRCompiler;
 @header{
         import java.util.HashMap;
         import java.util.Map;
+        
+       import models.ObjectSymbolTable;
 }
 
 @parser::members{   
-        //Map<String,Integer> TabSimb = new HashMap<String,Integer>();
+        Map<String, ObjectSymbolTable> SymbolTable = new HashMap<String, ObjectSymbolTable>();
 }
 
 programa: 'Class' ID ';' (decVars|decConsts|decFuncs)* main 

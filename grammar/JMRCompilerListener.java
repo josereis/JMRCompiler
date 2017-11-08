@@ -1,7 +1,11 @@
+package grammar;
+
 // Generated from JMRCompiler.g4 by ANTLR 4.7
 
         import java.util.HashMap;
         import java.util.Map;
+        
+       import models.ObjectSymbolTable;
 
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 

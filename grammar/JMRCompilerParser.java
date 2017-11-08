@@ -1,7 +1,11 @@
+package grammar;
+
 // Generated from JMRCompiler.g4 by ANTLR 4.7
 
         import java.util.HashMap;
         import java.util.Map;
+        
+       import models.ObjectSymbolTable;
 
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -104,7 +108,7 @@ public class JMRCompilerParser extends Parser {
 	public ATN getATN() { return _ATN; }
 
 	   
-	        //Map<String,Integer> TabSimb = new HashMap<String,Integer>();
+	        Map<String, ObjectSymbolTable> SymbolTable = new HashMap<String, ObjectSymbolTable>();
 
 	public JMRCompilerParser(TokenStream input) {
 		super(input);
