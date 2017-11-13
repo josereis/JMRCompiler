@@ -47,7 +47,8 @@ decFuncs: tipoF ID '(' lista_parametros ')' '{' decVars* decConsts* comandos+ '}
         ;
 
 lista_parametros: tipo ID (',' tipo ID)*
-                ;
+	| 
+	;
 
 main: 'Main' '{' comandos+ '}'
     ;
