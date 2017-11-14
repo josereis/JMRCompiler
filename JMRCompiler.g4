@@ -43,11 +43,10 @@ valor returns [Object value]: INT {$value = Integer.parseInt($INT.text);}
      			}
      ;
 
-decFuncs: tipoF ID '(' lista_parametros ')' '{' decVars* decConsts* comandos+ '}'
+decFuncs: tipoF ID '(' lista_parametros? ')' '{' decVars* decConsts* comandos+ '}'
         ;
 
 lista_parametros: tipo ID (',' tipo ID)*
-	| 
 	;
 
 main: 'Main' '{' comandos+ '}'
