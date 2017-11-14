@@ -48,6 +48,8 @@ public class Variable extends ObjectSymbolTable {
 
 	public Variable(int typeObjectSimbolTable, int memoryAddress) {
 		super(typeObjectSimbolTable, memoryAddress);
+		
+		this.functionName = null;
 	}
 	
 }

@@ -1,12 +1,14 @@
 package models;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Function extends ObjectSymbolTable {
 	private int returnType;
 	private String functionName;
-	private ArrayList<Parameter> parameters;
-	private ArrayList<Variable> localVariables;
+	
+	private Map<String, Parameter> parameters;
+	private Map<String, Variable> localVariables;
 	
 	public int getReturnType() {
 		return returnType;
@@ -24,40 +26,47 @@ public class Function extends ObjectSymbolTable {
 		this.functionName = functionName;
 	}
 
-	public ArrayList<Parameter> getParameters() {
+	public Map<String, Parameter> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(ArrayList<Parameter> parameter) {
+	public void addParameter(String id, Parameter parameter) {
+		parameters.put(id, parameter);
+	}
+	
+	public void setParameters(Map<String, Parameter> parameter) {
 		this.parameters = parameter;
 	}
 
-	public ArrayList<Variable> getLocalVariables() {
+	public Map<String, Variable> getLocalVariables() {
 		return localVariables;
 	}
+	
+	public void addLocalVariable(String id, Variable variable) {
+		localVariables.put(id, variable);
+	}
 
-	public void setLocalVariables(ArrayList<Variable> localVariables) {
+	public void setLocalVariables(Map<String, Variable> localVariables) {
 		this.localVariables = localVariables;
 	}
 	
-	public void addParameter(Parameter parameter) {
-		if(parameter != null) {
-			this.parameters.add(parameter);
+	/**
+	 * 
+	 * @param id
+	 * @return true (if id has already been declared in function)
+	 */
+	public boolean isDeclaredId(String id) {
+		if(parameters.containsKey(id) || localVariables.containsKey(id)) {
+			return true;
 		}
-	}
-	
-	public void addLocalVariable(Variable variable) {
-		if(variable != null) {
-			variable.setScope(Variable.LOCAL);
-			
-			this.localVariables.add(variable);
-		}
+		
+		return false;
 	}
 
 	public Function(int typeObjectSimbolTable, int memoryAddress) {
 		super(typeObjectSimbolTable, memoryAddress);
-		this.parameters = new ArrayList<Parameter>();
-		this.localVariables = new ArrayList<Variable>();
+		this.parameters = new HashMap<String, Parameter>();
+		this.localVariables = new HashMap<String, Variable>();
 	}
 	
 }
