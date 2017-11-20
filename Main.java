@@ -6,10 +6,11 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+
+import controller.SemanticActions;
 import grammar.*;
 
 import grammar.JMRCompilerLexer;
-import semantica.AcoesSemanticas;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
@@ -24,7 +25,7 @@ public class Main {
 		JMRCompilerParser parser = new JMRCompilerParser(tokens);
 		ParseTree tree = parser.programa();
       
-		AcoesSemanticas listener = new AcoesSemanticas();
+		SemanticActions listener = new SemanticActions(file);
 		ParseTreeWalker walker = new ParseTreeWalker();
 		walker.walk(listener, tree);
       
