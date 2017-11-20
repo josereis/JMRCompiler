@@ -8,19 +8,10 @@ package models;
 public class Variable extends ObjectSymbolTable {
 	// SCOPE LOCAL OR GLOBAL
 	public static final int GLOBAL = 1, LOCAL = 2;
-	
-	private int type;
+
 	private int scope;
 	private Object valueObject;
 	private String functionName; // PARA O CASO DE SE TRATAR DE UMA VARIAVEL LOCAL
-	
-	public int getType() {
-		return type;
-	}
-
-	public void setType(int type) {
-		this.type = type;
-	}
 
 	public int getScope() {
 		return scope;

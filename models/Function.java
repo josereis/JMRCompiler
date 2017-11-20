@@ -4,19 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Function extends ObjectSymbolTable {
-	private int returnType;
 	private String functionName;
 	
 	private Map<String, Parameter> parameters;
 	private Map<String, Variable> localVariables;
-	
-	public int getReturnType() {
-		return returnType;
-	}
-
-	public void setReturnType(int returnType) {
-		this.returnType = returnType;
-	}
 
 	public String getFunctionName() {
 		return functionName;
@@ -48,6 +39,13 @@ public class Function extends ObjectSymbolTable {
 
 	public void setLocalVariables(Map<String, Variable> localVariables) {
 		this.localVariables = localVariables;
+	}
+	
+	public ObjectSymbolTable objectVariableOrParameter(String id) {
+		if(parameters.containsKey(id))
+			return parameters.get(id); // retorna o parametro
+		else
+			return localVariables.get(id); // retorna a variavel local
 	}
 	
 	/**
