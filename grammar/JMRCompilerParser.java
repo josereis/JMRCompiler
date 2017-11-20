@@ -576,6 +576,7 @@ public class JMRCompilerParser extends Parser {
 	}
 
 	public static class ValorContext extends ParserRuleContext {
+		public int type;
 		public Object value;
 		public Token INT;
 		public Token REAL;
@@ -611,7 +612,7 @@ public class JMRCompilerParser extends Parser {
 				{
 				setState(116);
 				((ValorContext)_localctx).INT = match(INT);
-				((ValorContext)_localctx).value =  Integer.parseInt((((ValorContext)_localctx).INT!=null?((ValorContext)_localctx).INT.getText():null));
+				((ValorContext)_localctx).type =  1; ((ValorContext)_localctx).value =  Integer.parseInt((((ValorContext)_localctx).INT!=null?((ValorContext)_localctx).INT.getText():null));
 				}
 				break;
 			case REAL:
@@ -619,7 +620,7 @@ public class JMRCompilerParser extends Parser {
 				{
 				setState(118);
 				((ValorContext)_localctx).REAL = match(REAL);
-				((ValorContext)_localctx).value =  Float.parseFloat((((ValorContext)_localctx).REAL!=null?((ValorContext)_localctx).REAL.getText():null));
+				((ValorContext)_localctx).type =  2; ((ValorContext)_localctx).value =  Float.parseFloat((((ValorContext)_localctx).REAL!=null?((ValorContext)_localctx).REAL.getText():null));
 				}
 				break;
 			case STRING:
@@ -627,7 +628,7 @@ public class JMRCompilerParser extends Parser {
 				{
 				setState(120);
 				((ValorContext)_localctx).STRING = match(STRING);
-				((ValorContext)_localctx).value =  (((ValorContext)_localctx).STRING!=null?((ValorContext)_localctx).STRING.getText():null);
+				((ValorContext)_localctx).type =  3; ((ValorContext)_localctx).value =  (((ValorContext)_localctx).STRING!=null?((ValorContext)_localctx).STRING.getText():null);
 				}
 				break;
 			case BOOLEAN:
@@ -635,7 +636,7 @@ public class JMRCompilerParser extends Parser {
 				{
 				setState(122);
 				((ValorContext)_localctx).BOOLEAN = match(BOOLEAN);
-
+				((ValorContext)_localctx).type =  4;
 				     			if(((((ValorContext)_localctx).BOOLEAN!=null?((ValorContext)_localctx).BOOLEAN.getText():null)).equals("true"))
 				     				((ValorContext)_localctx).value =  true;
 				     			else
