@@ -35,7 +35,7 @@ public class Utils {
 				System.out.println("ERRO: tipos incompativeis para a realização do comando OR.");
 		}
 		
-		return -1;
+		return ERROTYPE;
 	}
 	
 	public static int verifyctJoinType(JMRCompilerParser.JoinContext ctx, SemanticActions semanticActions) {
@@ -48,7 +48,7 @@ public class Utils {
 				System.out.println("ERRO: tipos incompativeis para a realização do comando AND.");
 		}
 		
-		return -1;
+		return ERROTYPE;
 	}
 	
 	public static int verifyctRelType(JMRCompilerParser.RelContext ctx, SemanticActions semanticActions) {
@@ -81,7 +81,7 @@ public class Utils {
 		}
 		
 		
-		return -1;
+		return ERROTYPE;
 	}
 	
 	public static int verifyctEqualityType(JMRCompilerParser.EqualityContext ctx, SemanticActions semanticActions) {
@@ -103,7 +103,7 @@ public class Utils {
 					System.out.println("ERRO: tipos incompativeis para realização da comparação de igualdade (== ; !=)");
 		}
 		
-		return -1;
+		return ERROTYPE;
 	}
 	
 	public static int verifyctExprType(JMRCompilerParser.ExprContext ctx, SemanticActions semanticActions) {
@@ -134,7 +134,7 @@ public class Utils {
 			}
 		}
 		
-		return -1;
+		return ERROTYPE;
 	}
 	
 	public static int verifyctTermoType(JMRCompilerParser.TermContext ctx, SemanticActions semanticActions) {
@@ -144,28 +144,30 @@ public class Utils {
 			int typeTermo = verifyctTermoType((JMRCompilerParser.TermContext)ctx.getChild(0), semanticActions);
 			int typeUnary = verifyctUnaryType((JMRCompilerParser.UnaryContext) ctx.getChild(2), semanticActions);
 			
+			
+			
 			if(ctx.getChild(1).getText().equals("*")) {
-				if(typeTermo == typeUnary && (typeTermo == INT || typeTermo == FLOAT)) {
-					return typeTermo;
-				} else if(typeTermo == INT && typeUnary == FLOAT) {
-					return typeUnary;
-				} else if(typeTermo == FLOAT && typeUnary == INT) {
-					return typeTermo;
-				} else {
-					return -1;
-				}
+				if((typeTermo==INT || typeTermo==FLOAT)&&(typeUnary==INT || typeUnary==FLOAT)) {
+					if(typeTermo==FLOAT || typeUnary==FLOAT) {
+						return FLOAT;
+					} else {
+						return INT;
+					}
+				} else
+					System.out.println("ERRO: tipos incompativeis para realização da multiplicação.");
 			} else { // Trata da operação de divisão
-				if(typeTermo == typeUnary && (typeTermo == INT || typeTermo == FLOAT)) {
-					return typeTermo;
-				} else if(typeTermo == INT && typeUnary == FLOAT) {
-					return typeUnary;
-				} else if(typeTermo == FLOAT && typeUnary == INT) {
-					return typeTermo;
-				} else {
-					return -1;
-				}
+				if((typeTermo==INT || typeTermo==FLOAT)&&(typeUnary==INT || typeUnary==FLOAT)) {
+					if(typeTermo==FLOAT || typeUnary==FLOAT) {
+						return FLOAT;
+					} else {
+						return INT;
+					}
+				} else
+					System.out.println("ERRO: tipos incompativeis para realização da divisão.");
 			}
 		}
+		
+		return ERROTYPE;
 	}
 	
 	public static int verifyctUnaryType(JMRCompilerParser.UnaryContext ctx, SemanticActions semanticActions) {
@@ -177,14 +179,14 @@ public class Utils {
 				if(type == BOOL) {
 					return BOOL;
 				} else {
-					return -1;
+					return ERROTYPE;
 				}
 			} else {
 				switch (type) {
-				case INT: return INT;
-				case FLOAT: return FLOAT;
-				default:
-					return -1;
+					case INT: return INT;
+					case FLOAT: return FLOAT;
+					default:
+						return ERROTYPE;
 				}
 			}
 		}
@@ -213,6 +215,7 @@ public class Utils {
 					object = semanticActions.getSymbolTable().get(ctx.getChild(0).getText());
 					
 					if(object.getTypeObjectSimbolTable() == CONSTANT) {
+						
 						return ((Constant)object).getType();
 					} else if(object.getTypeObjectSimbolTable() == VARIABLE) {
 						return ((Variable)object).getType();
@@ -241,7 +244,7 @@ public class Utils {
 			}
 		}
 		
-		return -1;
+		return ERROTYPE;
 	}
 	
 }
