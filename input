@@ -1,11 +1,8 @@
 Class exem;
-Int: a, b, c, d;
+Float: a, b, c, d;
+Str: str;
 final Int e = 5;
-final Float h = 10;
-final Str i = "algo";
-final Bool j = false;
 
 Main {
-	c = "s";
-	print("Teste de print", 2, 1.1111, "teste");
+	read(a, str);
 }

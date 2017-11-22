@@ -16,7 +16,7 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	private GenerationOfCode generationOfCode;
 	private String nameFunction = "";
 	private Map<String, ObjectSymbolTable> symbolTable = new HashMap<String, ObjectSymbolTable>();
-	private boolean isDeclaredFunction = false, isMain = true, isReadInt = false, isReadFloat = false, isReadString = false;
+	private boolean isDeclaredFunction = false, isMain = true;
     
     public boolean getIsDeclaredFunction() {
     	return isDeclaredFunction;
@@ -177,12 +177,40 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	}
 	
 	/**
+	 * @description: TRATAMENTO DA REALIZAÇÃO DO COMANDO READ
+	 */
+	public void enterRead(JMRCompilerParser.ReadContext ctx) {
+		// para verificar todos os ids passados para a leitura
+		for(TerminalNode id: ctx.listaIDs2().ID()) {
+			if(!(symbolTable.get(id.getText()) instanceof Constant) && !(symbolTable.get(id.getText()) instanceof Function)) {
+				ObjectSymbolTable object = null;
+				if(!isMain && ((Function) symbolTable.get(nameFunction)).isDeclaredId(id.getText())) {
+					object = ((Function) symbolTable.get(nameFunction)).objectVariableOrParameter(id.getText());
+				} else if(symbolTable.containsKey(id.getText())){
+					object = symbolTable.get(id.getText());
+				} else
+					System.out.println("ERRO (linha:" + id.getSymbol().getLine() + "): id especificado não corresponde a uma variavel declarada.");
+				
+				generationOfCode.generationRead(object.getType(), object.getMemoryAddress());
+			} else
+				System.out.println("ERRO (linha:" + id.getSymbol().getLine() + "): id especificado consiste em uma constante, ou função, e seu valor não pode ser alterado.");
+		}
+	}
+	
+	 public void exitRead(JMRCompilerParser.ReadContext ctx) {
+		 
+	 }
+	
+	/**
 	 * @description: TRATAMENTO DA REALIZAÇÃO DO COMANDO PRINT
 	 */
 	public void enterPrint(JMRCompilerParser.PrintContext ctx) {
 		for(JMRCompilerParser.BoolContext obj: ctx.bool()) {
 			generationOfCode.initGenerationPrint(); // inicializa o codigo para print de uma expressão
-			generationOfCode.execPrint(Utils.verifyctBoolType(obj, this));
+			
+			// pegar o valor ou expressão a ser retornada pelo context de Bool
+			
+			generationOfCode.execPrint(Utils.verifyctBoolType(obj, this)); // chama função de print de acordo com o tipo passado
 		}
 		generationOfCode.printNewLine();
 	}

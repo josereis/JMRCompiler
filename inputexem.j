@@ -2,48 +2,48 @@
 .super java/lang/Object
 
 .method public static main([Ljava/lang/String;)V
-.limit stack 100 ; aloca o tamanho para a pilha, ou seja, declara a pilha a ser usada.
-.limit locals 9
+	.limit stack 100 ; aloca o tamanho para a pilha, ou seja, declara a pilha a ser usada.
+	.limit locals 6
 
-istore 0
-istore 1
-istore 2
-istore 3
-ldc 5	; carregar constante
-istore 4
-ldc 10.0	; carregar constante
-fstore 5
-ldc "algo"	; carregar constante
-astore 6
-ldc 0
-istore 7
+	astore 4
+	fstore 0
+	fstore 1
+	fstore 2
+	fstore 3
+	ldc 5	; carregar constante
+	istore 5
+	invokestatic exem.readFloat()F
+	fstore 0
+	invokestatic exem/readString()Ljava/lang/String;
+	astore 4
 
-getstatic java/lang/System/out Ljava/io/PrintStream;
-invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
-
-
-getstatic java/lang/System/out Ljava/io/PrintStream;
-invokevirtual java/io/PrintStream/print(I)V
-
-
-getstatic java/lang/System/out Ljava/io/PrintStream;
-invokevirtual java/io/PrintStream/print(F)V
-
-
-getstatic java/lang/System/out Ljava/io/PrintStream;
-invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
-
-
-getstatic java/lang/System/out Ljava/io/PrintStream;
-ldc ""
-invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
-
-
-getstatic java/lang/System/in Ljava/io/InputStream;	; pausa para finalizar com enter.
-invokevirtual java/io/InputStream/read()I
-invokevirtual java/io/InputStream/read()I
-
-return
-
+	return
 .end method
 
+
+.method public static readReal()F
+	.limit stack 3
+	.limit locas 1
+
+	new java/util/Scanner
+	dup	getstatic java/lang/System/in Ljava/io/InputStream;
+	invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V
+	astore 0
+	aload 0
+	invokevirtual java/util/Scanner/nextFloat()F
+	freturn
+
+.end method
+.method public static readString()Ljava/lang/String;
+	.limit stack 5
+	.limit locals 1
+
+	new java/io/BufferedReader
+	dup	getstatic java/lang/System/in Ljava/io/InputStream;
+	invokespecial java/io/InputStreamReader/<init>(Ljava/io/InputStream;)V
+	invokespecial java/io/BufferedReader/<init>(Ljava/io/Reader;)V
+	astore 0	aload 0	invokevirtual java/io/BufferedReader/readLine()Ljava/lang/String;
+	areturn
+
+.throws java/lang/Exception
+.end
