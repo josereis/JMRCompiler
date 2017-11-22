@@ -6,6 +6,6 @@ final Str i = "algo";
 final Bool j = false;
 
 Main {
-	c = 10;
+	c = "s";
 	print("Teste de print", 2, 1.1111, "teste");
 }

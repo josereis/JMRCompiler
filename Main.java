@@ -14,7 +14,7 @@ import grammar.JMRCompilerLexer;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
-		String file = "C:/Users/José Reis R Santiago/eclipse-workspace/JMRCompiler/src/input";
+		String file = "C:\\Users\\jsrib\\eclipse-workspace\\JMRCompiler\\src\\input";
 		
 		InputStream input = new FileInputStream(file);
 		ANTLRInputStream stream = new ANTLRInputStream(input);
