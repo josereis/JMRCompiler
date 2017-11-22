@@ -80,7 +80,7 @@ public class GenerationOfCode {
 						);
 		
 		if(codeReadInt)
-			generatedFunctionReadFloat();
+			generatedFunctionReadInt();
 		
 		if(codeReadFloat)
 			generatedFunctionReadFloat();
@@ -244,9 +244,8 @@ public class GenerationOfCode {
 						+ "	invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V\n"
 						+ "	astore 0\n"
 						+ "	aload 0\n"
-						+ "	invokevirtual java/io/BufferedReader/readLine()Ljava/lang/String;\n"
-						+ "	areturn\n\n"
-						+ ".throws java/lang/Exception\n"
+						+ "	invokevirtual java/util/Scanner/nextFloat()F\n"
+						+ "	freturn\n\n"
 						+ ".end method"
 				);
 	}
