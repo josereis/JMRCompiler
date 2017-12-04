@@ -5,7 +5,9 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 import models.Constant;
+import models.Function;
 import models.ObjectSymbolTable;
+import models.Parameter;
 import utils.Utils;
 
 /**
@@ -39,6 +41,7 @@ public class GenerationOfCode {
 		switch (type) {
 			case Utils.INT: return "I";
 			case Utils.BOOL: return "I";
+			case Utils.VOID: return "V";
 			case Utils.FLOAT: return "F";
 			case Utils.STRING: return "Ljava/lang/String;";
 			
@@ -231,7 +234,20 @@ public class GenerationOfCode {
 	}
 	
 	private void generatedFunctionReadInt() {
-		
+		filePrint.println(".method public static read()I\n"
+						+ "	.limit stack 3 ; tamanho maximo da pilha\n"
+						+ "	.limit locals 1 ; numero maximo de variaveis locais ao metodo\n\n"
+						+ "	; inicio da função de entrada\n"
+						+ "	new java/util/Scanner\n"
+						+ "	dup ; duplica topo da pinlha\n"
+						+ "	getstatic java/lang/System/in Ljava/io/InputStream;\n"
+						+ "	invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V\n"
+						+ "	astore 0\n"
+						+ "	aload 0\n"
+						+ "	invokevirtual java/util/Scanner/nextInt()I\n\n"
+						+ "	ireturn\n"
+						+ ".end method\n"
+				);
 	}
 	
 	private void generatedFunctionReadFloat() {
@@ -239,7 +255,7 @@ public class GenerationOfCode {
 						+ "	.limit stack 3\n"
 						+ "	.limit locas 1\n\n"
 						+ "	new java/util/Scanner\n"
-						+ "	dup"
+						+ "	dup\n"
 						+ "	getstatic java/lang/System/in Ljava/io/InputStream;\n"
 						+ "	invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V\n"
 						+ "	astore 0\n"
@@ -255,16 +271,16 @@ public class GenerationOfCode {
 						+ "	.limit stack 5\n"
 						+ "	.limit locals 1\n\n"
 						+ "	new java/io/BufferedReader\n"
-						+ "	dup"
+						+ "	dup\n"
 						+ "	getstatic java/lang/System/in Ljava/io/InputStream;\n"
 						+ "	invokespecial java/io/InputStreamReader/<init>(Ljava/io/InputStream;)V\n"
                         + "	invokespecial java/io/BufferedReader/<init>(Ljava/io/Reader;)V\n"
-                        + "	astore 0"
-                        + "	aload 0"
-                        + "	invokevirtual java/io/BufferedReader/readLine()Ljava/lang/String;\n"
-                        + "	areturn\n\n"
+                        + "	astore 0\n"
+                        + "	aload 0\n"
+                        + "	invokevirtual java/io/BufferedReader/readLine()Ljava/lang/String;\n\n"
+                        + "	areturn\n"
                         + ".throws java/lang/Exception\n"
-                        + ".end"
+                        + ".end method"
 						);
 	}
 	
@@ -281,7 +297,7 @@ public class GenerationOfCode {
 	}
 	
 	private void readString(int address) {
-		filePrint.println("	invokestatic " + programName + "/readString()Ljava/lang/String;");
+		filePrint.println("	invokestatic " + programName + ".readString()Ljava/lang/String;");
 		filePrint.println("	astore " + address);
 		codeReadString = true;
 	}
@@ -300,6 +316,38 @@ public class GenerationOfCode {
 			default: System.out.println("ERRO: tipo boolen nao pode ser lido.");
 				break;
 		}
+	}
+	
+	public void generationHeaderFunction(String functionName) {
+		Function function = (Function) symbolTable.get(functionName);
+		
+		if(function != null) {
+			filePrint.println("\n.method public static " + functionName + "(");
+			for(Parameter p: function.getParameters().values()) {
+				filePrint.print(typeObject(p.getType()));
+			}
+			filePrint.print(")" + typeObject(function.getType()));
+			filePrint.println("	.limit stack 10\n	.limit locals " + (function.getLocalVariables().size()) + "\n");
+		}
+	}
+	
+	public void generationFooterFunction(String nameFuction) {
+		Function function = (Function) symbolTable.get(nameFuction);
+		
+		filePrint.println("\n");
+		switch (function.getType()) {
+			case Utils.INT: filePrint.println("	ireturn");
+				break;
+			case Utils.FLOAT: filePrint.println("	freturn");
+				break;
+			case Utils.BOOL: filePrint.println("	ireturn");
+				break;
+			case Utils.STRING: filePrint.println("	areturn");
+				break;
+			default: filePrint.println("	return");
+				break;
+		}
+		filePrint.println(".end method\n");
 	}
 	
 	/**
