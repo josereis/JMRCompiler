@@ -9,6 +9,9 @@ import javax.rmi.CORBA.Util;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import utils.Utils;
 import grammar.*;
+import grammar.JMRCompilerParser.FuncaoContext;
+import grammar.JMRCompilerParser.Lista_parametrosContext;
+import grammar.JMRCompilerParser.ParametroContext;
 import models.*;
 
 public class SemanticActions extends JMRCompilerBaseListener {
@@ -16,7 +19,7 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	private GenerationOfCode generationOfCode;
 	private String nameFunction = "";
 	private Map<String, ObjectSymbolTable> symbolTable = new HashMap<String, ObjectSymbolTable>();
-	private boolean isDeclaredFunction = false, isMain = true;
+	private boolean isDeclaredFunction = false, isMain = true, isReturn = false;
     
     public boolean getIsDeclaredFunction() {
     	return isDeclaredFunction;
@@ -144,13 +147,29 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	public void enterDecFuncs(JMRCompilerParser.DecFuncsContext ctx) {
 		// verifica se id é ou não uma palavra reservada
 		if(!Utils.isReservedWord(ctx.ID().getText())) {
-			// verifica se id ja foi declarado (pertence a tabela de simbolos
+			// verifica se id ja foi declarado (pertence a tabela de simbolos)
 			if(!symbolTable.containsKey(ctx.ID().getText())) {
+				this.isReturn = true; // habilita uso do return
 				this.isDeclaredFunction = true;
 				this.nameFunction = ctx.ID().getText();
 				
+				// cria a função
+				Function function = new Function(Utils.FUNCTION, addressMemoryFree++);
 				
-				
+				function.setType(ctx.tipoF().type);
+				// verifica se possui ou não algum parametro (são opicionais)
+				if(ctx.lista_parametros() != null) {
+					for(ParametroContext parametro: ctx.lista_parametros().parametro()) {
+						if(!function.getParameters().containsKey(parametro.ID().getText())) {
+							Parameter p = new Parameter(Utils.PARAMETER, -1);
+							
+							p.setType(parametro.tipo().type);
+							function.addParameter(parametro.ID().getText(), p);
+						} else
+							System.out.println("ERRO: o id do parametro ja foi declarado na funcao.");
+					}
+				}
+				generationOfCode.generationHeaderFunction(this.nameFunction);
 			} else
 				System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): ID usado para indentificação da função já foi usado.");
 		} else
@@ -158,7 +177,11 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	}
 	
 	public void exitDecFuncs(JMRCompilerParser.DecFuncsContext ctx) {
+		this.isReturn = false;
 		this.isDeclaredFunction = false;
+		
+		generationOfCode.generationFooterFunction(this.nameFunction);
+		this.nameFunction = "";
 	}
 	
 	/**
