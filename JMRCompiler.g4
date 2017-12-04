@@ -43,10 +43,13 @@ valor returns [int type, Object value]: INT {$type = 1; $value = Integer.parseIn
      			}
      ;
 
-decFuncs: tipoF ID '(' lista_parametros? ')' '{' decVars* decConsts* comandos+ '}'
+decFuncs: tipoF ID '(' lista_parametros? ')' '{' decVars* comandos+ '}'
         ;
 
-lista_parametros: tipo ID (',' tipo ID)*
+parametro: tipo ID
+	;
+
+lista_parametros: parametro (',' parametro)*
 	;
 
 main: 'Main' '{' comandos+ '}'
