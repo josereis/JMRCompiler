@@ -30,6 +30,8 @@ public class Utils {
 			return verifyctJoinType((JMRCompilerParser.JoinContext) ctx.getChild(0), semanticActions);
 		} else { // caso contrario, é necessario avaliar as outras duas expressões, verificar se tratam-se de atributos booleanos e realizar a operação de 'or'
 			if(verifyctBoolType((JMRCompilerParser.BoolContext) ctx.getChild(0), semanticActions)==BOOL && verifyctJoinType((JMRCompilerParser.JoinContext) ctx.getChild(2), semanticActions)==BOOL) {
+				semanticActions.getGenerationOfCode().or();
+				
 				return BOOL;
 			} else
 				System.out.println("ERRO: tipos incompativeis para a realização do comando OR.");
@@ -43,6 +45,8 @@ public class Utils {
 			return verifyctRelType((JMRCompilerParser.RelContext) ctx.getChild(0), semanticActions);
 		} else {
 			if(verifyctJoinType((JMRCompilerParser.JoinContext) ctx.getChild(0), semanticActions)==BOOL && verifyctRelType((JMRCompilerParser.RelContext) ctx.getChild(2), semanticActions)==BOOL) {
+				semanticActions.getGenerationOfCode().and();
+				
 				return BOOL;
 			} else
 				System.out.println("ERRO: tipos incompativeis para a realização do comando AND.");
@@ -60,21 +64,33 @@ public class Utils {
 			
 			if((typeEq1==INT || typeEq1==FLOAT)&&(typeEq2==INT || typeEq2==FLOAT)) {
 				String op = ctx.getChild(1).getText();
-				
-				switch (op) {
-					case "<":
+				if(typeEq1==FLOAT || typeEq2==FLOAT) {	
+					switch (op) {
+						case "<": semanticActions.getGenerationOfCode().menor(FLOAT);
+							break;
+						case "<=": semanticActions.getGenerationOfCode().menorIgual(FLOAT);
+							break;
+						case ">": semanticActions.getGenerationOfCode().maior(FLOAT);
+							break;
+						case ">=": semanticActions.getGenerationOfCode().maiorIgual(FLOAT);
+							break;
+						default:
+							break;
+					}
+				} else {
+					switch (op) {
+					case "<": semanticActions.getGenerationOfCode().menor(INT);
 						break;
-					case "<=":
+					case "<=": semanticActions.getGenerationOfCode().menorIgual(INT);
 						break;
-					case ">":
+					case ">": semanticActions.getGenerationOfCode().maior(INT);
 						break;
-					case ">=":
+					case ">=": semanticActions.getGenerationOfCode().maiorIgual(INT);
 						break;
-
 					default:
 						break;
 				}
-				
+				}
 				return BOOL;
 			} else
 				System.out.println("ERRO: tipos incompativeis para realização da verificações relacionas (<=, <, >=, >).");
@@ -93,9 +109,33 @@ public class Utils {
 			
 			if((typeExpr==INT || typeExpr==FLOAT)&&(typeEquality==INT || typeEquality==FLOAT)) {
 				if(ctx.getChild(1).getText().equals("==")) {
-					// tratar verificação de igualdade
+					if(typeExpr==typeEquality) {
+						semanticActions.getGenerationOfCode().igualdade(typeExpr);
+					} else {
+						if(typeExpr==INT) {
+							// converte typeExpr para real
+							semanticActions.getGenerationOfCode().converteOper1Float(semanticActions.getAddressMemoryFree(), semanticActions.getNameFunction());
+							semanticActions.getGenerationOfCode().igualdade(FLOAT);
+						} else {
+							// converte typeEquality para real
+							semanticActions.getGenerationOfCode().coercaoIntToFloat();
+							semanticActions.getGenerationOfCode().igualdade(FLOAT);
+						}
+					}
 				} else {
-					// tratar verificação de diferença
+					if(typeExpr==typeEquality) {
+						semanticActions.getGenerationOfCode().desigualdade(typeExpr);
+					} else {
+						if(typeExpr==INT) {
+							// converte typeExpr para real
+							semanticActions.getGenerationOfCode().converteOper1Float(semanticActions.getAddressMemoryFree(), semanticActions.getNameFunction());
+							semanticActions.getGenerationOfCode().desigualdade(FLOAT);
+						} else {
+							// converte typeEquality para real
+							semanticActions.getGenerationOfCode().coercaoIntToFloat();
+							semanticActions.getGenerationOfCode().desigualdade(FLOAT);
+						}
+					}
 				}
 				
 				return BOOL;
@@ -116,8 +156,18 @@ public class Utils {
 			if(ctx.getChild(1).getText().equals("+")) {
 				if((typeExpr==INT || typeExpr==FLOAT)&&(typeTerm==INT || typeTerm==FLOAT)) {
 					if(typeExpr==FLOAT || typeTerm==FLOAT) {
+						if(typeExpr == FLOAT)
+							semanticActions.getGenerationOfCode().converteOper1Float(semanticActions.getAddressMemoryFree(), semanticActions.getNameFunction());
+						else
+							semanticActions.getGenerationOfCode().coercaoIntToFloat();
+						
+						// faz adição
+						semanticActions.getGenerationOfCode().adicaoFloat();
+							
 						return FLOAT;
 					} else {
+						semanticActions.getGenerationOfCode().adicaoInteira();
+
 						return INT;
 					}
 				} else
@@ -125,8 +175,18 @@ public class Utils {
 			} else { // Trata da operação de subtração
 				if((typeExpr==INT || typeExpr==FLOAT)&&(typeTerm==INT || typeTerm==FLOAT)) {
 					if(typeExpr==FLOAT || typeTerm==FLOAT) {
+						if(typeExpr == FLOAT)
+							semanticActions.getGenerationOfCode().converteOper1Float(semanticActions.getAddressMemoryFree(), semanticActions.getNameFunction());
+						else
+							semanticActions.getGenerationOfCode().coercaoIntToFloat();
+						
+						// faz adição
+						semanticActions.getGenerationOfCode().subFloat();
+						
 						return FLOAT;
 					} else {
+						semanticActions.getGenerationOfCode().subInteira();
+						
 						return INT;
 					}
 				} else
@@ -149,8 +209,16 @@ public class Utils {
 			if(ctx.getChild(1).getText().equals("*")) {
 				if((typeTermo==INT || typeTermo==FLOAT)&&(typeUnary==INT || typeUnary==FLOAT)) {
 					if(typeTermo==FLOAT || typeUnary==FLOAT) {
+						if(typeTermo == FLOAT)
+							semanticActions.getGenerationOfCode().converteOper1Float(semanticActions.getAddressMemoryFree(), semanticActions.getNameFunction());
+						else
+							semanticActions.getGenerationOfCode().coercaoIntToFloat();
+						
+						semanticActions.getGenerationOfCode().multFloat();
+						
 						return FLOAT;
 					} else {
+						semanticActions.getGenerationOfCode().multInteira();
 						return INT;
 					}
 				} else
@@ -158,8 +226,17 @@ public class Utils {
 			} else { // Trata da operação de divisão
 				if((typeTermo==INT || typeTermo==FLOAT)&&(typeUnary==INT || typeUnary==FLOAT)) {
 					if(typeTermo==FLOAT || typeUnary==FLOAT) {
+						if(typeTermo == FLOAT)
+							semanticActions.getGenerationOfCode().converteOper1Float(semanticActions.getAddressMemoryFree(), semanticActions.getNameFunction());
+						else
+							semanticActions.getGenerationOfCode().coercaoIntToFloat();
+						
+						semanticActions.getGenerationOfCode().divFloat();
+						
 						return FLOAT;
 					} else {
+						semanticActions.getGenerationOfCode().divInteira();
+						
 						return INT;
 					}
 				} else
@@ -174,17 +251,20 @@ public class Utils {
 		if(ctx.getChildCount() == 1) { // deriva em fator
 			return verifyctFatorType((JMRCompilerParser.FactorContext) ctx.getChild(0), semanticActions);
 		} else {
-			int type = verifyctFatorType((JMRCompilerParser.FactorContext) ctx.getChild(0), semanticActions);
+			int type = verifyctFatorType((JMRCompilerParser.FactorContext) ctx.getChild(1), semanticActions);
 			if(ctx.getChild(0).getText().equals("!")) {
 				if(type == BOOL) {
+					semanticActions.getGenerationOfCode().notBool();
+					
 					return BOOL;
 				} else {
 					return ERROTYPE;
 				}
 			} else {
 				switch (type) {
-					case INT: return INT;
-					case FLOAT: return FLOAT;
+					case INT: {semanticActions.getGenerationOfCode().minus(type); return INT;}
+					case FLOAT: {semanticActions.getGenerationOfCode().minus(type); return FLOAT;}
+					
 					default:
 						return ERROTYPE;
 				}
@@ -201,10 +281,30 @@ public class Utils {
 			return func.getType();
 		} else if(ctx.getChild(0) instanceof JMRCompilerParser.ValorContext) {
 			switch (((JMRCompilerParser.ValorContext) ctx.getChild(0)).type) {
-				case INT: return INT;
-				case BOOL: return BOOL;
-				case FLOAT: return FLOAT;
-				case STRING: return STRING;
+				case INT: {
+					semanticActions.getGenerationOfCode().ldc(((JMRCompilerParser.ValorContext) ctx.getChild(0)).value);
+					
+					return INT;
+				}
+				case BOOL: {
+					if((boolean)((JMRCompilerParser.ValorContext) ctx.getChild(0)).value) {
+						semanticActions.getGenerationOfCode().ldc(1);
+					} else {
+						semanticActions.getGenerationOfCode().ldc(0);
+					}
+					
+					return BOOL;
+				}
+				case FLOAT: {
+					semanticActions.getGenerationOfCode().ldc(((JMRCompilerParser.ValorContext) ctx.getChild(0)).value);
+					
+					return FLOAT;
+				}
+				case STRING: {
+					semanticActions.getGenerationOfCode().ldc(((JMRCompilerParser.ValorContext) ctx.getChild(0)).value);
+					
+					return STRING;
+				}
 	
 				default: return -1;
 			}
@@ -214,8 +314,9 @@ public class Utils {
 				if(semanticActions.getSymbolTable().containsKey(ctx.getChild(0).getText())) {
 					object = semanticActions.getSymbolTable().get(ctx.getChild(0).getText());
 					
+					semanticActions.getGenerationOfCode().loadVariable(object.getType(), object.getMemoryAddress());
+					
 					if(object.getTypeObjectSimbolTable() == CONSTANT) {
-						
 						return ((Constant)object).getType();
 					} else if(object.getTypeObjectSimbolTable() == VARIABLE) {
 						return ((Variable)object).getType();
