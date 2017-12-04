@@ -1,8 +1,7 @@
 Class exem;
 Int: a, b, c, d;
-Str: str;
-final Int e = 5;
 
 Main {
-	read(a, str);
+	a = 20 + 30;
+	print("Oi... Teste", a);
 }
