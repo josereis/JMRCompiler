@@ -530,15 +530,15 @@ public class GenerationOfCode {
 	
 	public void converteOper1Float(int address, String nomeFunction) {
 		if(nomeFunction.equals("")) { // main
-			filePrint.println("fstore " + address + " ; salva o valor do segundo operando");
-			filePrint.println("i2f");
-			filePrint.print("fload " + address + " ; carrega o valor do segundo operando para a pilha");
+			filePrint.println("	fstore " + address + " ; salva o valor do segundo operando");
+			filePrint.println("	i2f");
+			filePrint.print("	fload " + address + " ; carrega o valor do segundo operando para a pilha");
 		} else { // função
 			int addressFunction = ((Function) symbolTable.get(nomeFunction)).getLocalVariables().size() + ((Function) symbolTable.get(nomeFunction)).getParameters().size() + 1;
 			
-			filePrint.println("fstore " + addressFunction + " ; salva o valor do segundo operando");
-			filePrint.println("i2f");
-			filePrint.print("fload " + addressFunction + " ; carrega o valor do segundo operando para a pilha");
+			filePrint.println("	fstore " + addressFunction + " ; salva o valor do segundo operando");
+			filePrint.println("	i2f");
+			filePrint.print("	fload " + addressFunction + " ; carrega o valor do segundo operando para a pilha");
 		}
 	}
 	
@@ -546,11 +546,11 @@ public class GenerationOfCode {
 	 * comparadores logicos
 	 */
 	public void and() {
-		filePrint.println("iand");
+		filePrint.println("	iand");
 	}
 	
 	public void or() {
-		filePrint.println("ior");
+		filePrint.println("	ior");
 	}
 	
 	public void notBool() {
@@ -566,10 +566,10 @@ public class GenerationOfCode {
 	
 	public void minus(int type) {
 		if(type==Utils.FLOAT) {
-			filePrint.println("ldc -1.0");
+			filePrint.println("	ldc -1.0");
 			multFloat();
 		} else {
-			filePrint.println("ldc -1");
+			filePrint.println("	ldc -1");
 			multInteira();
 		}
 	}
@@ -578,35 +578,35 @@ public class GenerationOfCode {
 	 * operadores arritmeticos
 	 */
 	public void adicaoFloat() {
-		filePrint.println("fadd");
+		filePrint.println("	fadd");
 	}
 	
 	public void adicaoInteira() {
-		filePrint.println("iadd");
+		filePrint.println("	iadd");
 	}
 	
 	public void subFloat() {
-		filePrint.println("fsub");
+		filePrint.println("	fsub");
 	}
 	
 	public void subInteira() {
-		filePrint.println("isub");
+		filePrint.println("	isub");
 	}
 	
 	public void multFloat() {
-		filePrint.println("fmul");
+		filePrint.println("	fmul");
 	}
 	
 	public void multInteira() {
-		filePrint.println("imul");
+		filePrint.println("	imul");
 	}
 	
 	public void divFloat() {
-		filePrint.println("fdiv");
+		filePrint.println("	fdiv");
 	}
 	
 	public void divInteira() {
-		filePrint.println("idiv");
+		filePrint.println("	idiv");
 	}
 	
 	/**
@@ -618,36 +618,36 @@ public class GenerationOfCode {
 	 * Operação condicional IF
 	 */
 	public void generationInitIfCode() {
-		filePrint.println("ifeq Lif" + labelsIf.push()+" ; inicializa o if");
+		filePrint.println("	ifeq Lif" + labelsIf.push()+" ; inicializa o if");
 	}
 	
 	public void generationFinalIfCode() {
-		filePrint.println("ifeq Lif" + labelsIf.pop()+" ; finaliza o if");
+		filePrint.println("	ifeq Lif" + labelsIf.pop()+" ; finaliza o if");
 	}
 	
 	public void generationInitIfElseCode() {
-		filePrint.println("ifeq LIfE" + labelsIfE.push()+" ; inicializa o if");
+		filePrint.println("	ifeq LIfE" + labelsIfE.push()+" ; inicializa o if");
 	}
 	
 	/**
 	 * Carregndo valores na pilha
 	 */
 	public void ldc(Object value) {
-		filePrint.println("ldc " + value + " ; carrega o valor na pilha"); 
+		filePrint.println("	ldc " + value + " ; carrega o valor na pilha"); 
 	}
 	
 	public void incremento(int type, int address) {
 		if(type==Utils.INT)
-			filePrint.println("iinc " + address + " 1");
+			filePrint.println("	iinc " + address + " 1");
 		else
-			filePrint.println("finc " + address + " 1.0");
+			filePrint.println("	finc " + address + " 1.0");
 	}
 	
 	public void decremento(int type, int address) {
 		if(type==Utils.INT)
-			filePrint.println("iinc " + address + " -1");
+			filePrint.println("	iinc " + address + " -1");
 		else
-			filePrint.println("finc " + address + " -1.0");
+			filePrint.println("	finc " + address + " -1.0");
 	}
 	
 	/**
