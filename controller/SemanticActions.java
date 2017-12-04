@@ -9,6 +9,7 @@ import javax.rmi.CORBA.Util;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import utils.Utils;
 import grammar.*;
+import grammar.JMRCompilerParser.BoolContext;
 import grammar.JMRCompilerParser.FuncaoContext;
 import grammar.JMRCompilerParser.Lista_parametrosContext;
 import grammar.JMRCompilerParser.ParametroContext;
@@ -18,9 +19,18 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	private int addressMemoryFree = 0;
 	private GenerationOfCode generationOfCode;
 	private String nameFunction = "";
-	private Map<String, ObjectSymbolTable> symbolTable = new HashMap<String, ObjectSymbolTable>();
+	private PilhaIteracao iteracoes = new PilhaIteracao();
 	private boolean isDeclaredFunction = false, isMain = true, isReturn = false;
+	private Map<String, ObjectSymbolTable> symbolTable = new HashMap<String, ObjectSymbolTable>();
     
+	public GenerationOfCode getGenerationOfCode() {
+		return generationOfCode;
+	}
+
+	public void setGenerationOfCode(GenerationOfCode generationOfCode) {
+		this.generationOfCode = generationOfCode;
+	}
+	
     public boolean getIsDeclaredFunction() {
     	return isDeclaredFunction;
     }
@@ -184,6 +194,65 @@ public class SemanticActions extends JMRCompilerBaseListener {
 		this.nameFunction = "";
 	}
 	
+	/*private void enterForComand(JMRCompilerParser.ComandosContext ctx) {
+		iteracoes.push(1);
+		ObjectSymbolTable object = null;
+		if(ctx.atrib().getChildCount()==4) { // verifica se não é uma atribuição de incremento ou decremento
+			if(!isMain && ((Function) symbolTable.get(nameFunction)).isDeclaredId(ctx.atrib().ID().getText())) {
+				object = ((Function) symbolTable.get(nameFunction)).objectVariableOrParameter(ctx.atrib().ID().getText());
+			} else if(symbolTable.containsKey(ctx.atrib().ID().getText())) {
+				object = symbolTable.get(ctx.atrib().ID().getText());
+			} else {
+				System.out.println("ERRO: id não declarado para comando for");
+			}
+			
+			// inicaliza comando de for em codigo de 3 enderecos
+//			generationOfCode.generationHeaderFor();
+			// carrega o valor da variavel de teste
+			generationOfCode.loadVariable(object.getType(), object.getMemoryAddress());
+			
+			// verifi
+			
+			
+			
+		} else
+			System.out.println("ERRO: atribuição incorreta(não pode ser um incremento nem decremento).");
+	}*/
+	
+	private void enterReturnComand(JMRCompilerParser.ComandosContext ctx) {
+		if(isReturn) {
+			int typeFunction = symbolTable.get(nameFunction).getType(), typeBool = Utils.verifyctBoolType(ctx.bool(0), this);
+			if(typeBool == typeFunction) {
+				if(typeFunction==Utils.INT && typeBool==Utils.FLOAT) {
+					generationOfCode.coercaoIntToFloat();
+				} else {
+					// codigo sem coercao
+				}
+			} else
+				System.out.println("ERRO: tipo de retorno incompativel com o tipo definido na função");
+		} else
+			System.out.println("ERRO: return sendo usado fora do escopo de uma função.");
+	}
+	
+	public void enterComandos(JMRCompilerParser.ComandosContext ctx) {
+		if(ctx.getChild(0).getText().equals("return")) {
+			enterReturnComand(ctx); // trata o comando de retorno
+		} else if(ctx.getChild(0).getText().equals("if")) {
+			if(ctx.getChildCount() >= 8) { // caso seja o comando if_else
+				
+			} else {
+				if(Utils.verifyctBoolType((BoolContext) ctx.getChild(2), this)==Utils.BOOL) {
+					
+				} else
+					System.out.println("ERRO: tipos incompativeis na comparação do if");
+			}
+		}
+	}
+	
+	public void exitComandos(JMRCompilerParser.ComandosContext ctx) {
+		 
+	}
+	
 	/**
 	 * @description: TRATAMENTO DO BLOCO MAIN
 	 */
@@ -231,8 +300,6 @@ public class SemanticActions extends JMRCompilerBaseListener {
 		for(JMRCompilerParser.BoolContext obj: ctx.bool()) {
 			generationOfCode.initGenerationPrint(); // inicializa o codigo para print de uma expressão
 			
-			// pegar o valor ou expressão a ser retornada pelo context de Bool
-			
 			generationOfCode.execPrint(Utils.verifyctBoolType(obj, this)); // chama função de print de acordo com o tipo passado
 		}
 		generationOfCode.printNewLine();
@@ -277,8 +344,10 @@ public class SemanticActions extends JMRCompilerBaseListener {
 					if(object.getType()==Utils.INT || object.getType()==Utils.FLOAT) {
 						if(op.equals("++")) {
 							// atribuição de incremento (pensar em como avaliar com real ou inteiro para faze a atribuição de maneira correta).
+							generationOfCode.incremento(object.getType(), object.getMemoryAddress());
 						} else {
 							// atribuição de decremento (pensar em como avaliar com real ou inteiro para faze a atribuição de maneira correta).
+							generationOfCode.decremento(object.getType(), object.getMemoryAddress());
 						}
 					} else
 						System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): tipo incompativel para operação de atribuição (ou ++ ou --).");
