@@ -4,10 +4,15 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Map;
 
+import grammar.JMRCompilerBaseListener;
+import grammar.JMRCompilerParser;
+import grammar.JMRCompilerParser.BoolContext;
+import grammar.JMRCompilerParser.JoinContext;
 import models.Constant;
 import models.Function;
 import models.ObjectSymbolTable;
 import models.Parameter;
+import models.PilhaLabels;
 import utils.Utils;
 
 /**
@@ -16,10 +21,12 @@ import utils.Utils;
  *
  */
 public class GenerationOfCode {
+	private int labels = 0;
 	private PrintWriter filePrint;
 	private String programName, sourceFileDirectory;
 	private Map<String, ObjectSymbolTable> symbolTable;
 	private boolean codeReadInt = false, codeReadFloat = false, codeReadString = false;
+	private PilhaLabels labelsFor = new PilhaLabels(), labelsIf = new PilhaLabels(), labelsIfE = new PilhaLabels();
 	
 	public void setProgramName(String programName) {
 		this.programName = programName;
@@ -140,7 +147,7 @@ public class GenerationOfCode {
 		filePrint.println("	istore " + address);
 	}
 	
-	private void coercaoIntToFloat() {
+	public void coercaoIntToFloat() {
 			filePrint.println("	i2f");
 	}
 	
@@ -183,6 +190,21 @@ public class GenerationOfCode {
 	
 	public void loadBoolean(int address) {
 		filePrint.println(" iload " + address);
+	}
+	
+	public void loadVariable(int type, int address) {
+		switch (type) {
+			case Utils.INT: loadInteger(address);
+				break;
+			case Utils.FLOAT: loadFloat(address);
+				break;
+			case Utils.STRING: loadString(address);
+				break;
+			case Utils.BOOL: loadBoolean(address);
+				break;
+			default:
+				break;
+		}
 	}
 	
 	/**
@@ -348,6 +370,284 @@ public class GenerationOfCode {
 				break;
 		}
 		filePrint.println(".end method\n");
+	}
+	
+	/**
+	 * comparadores relacionais
+	 */
+	public void if_icmpeq() { // comparação de igualdade de inteiros
+		filePrint.print("	if_icmpeq ");
+	}
+	
+	public void if_icmpne() { // comparação de valores diferentes inteiros
+		filePrint.print("	if_icmpne ");
+	}
+	
+	public void if_icmpgt() { // >
+		filePrint.print("	if_icmpgt ");
+	}
+	
+	public void if_icmpge() { // >=
+		filePrint.print("	if_icmpge ");
+	}
+	
+	public void if_icmplt() { // <
+		filePrint.print("	if_icmplt ");
+	}
+	
+	public void if_icmple() { // >=
+		filePrint.print("	if_icmple ");
+	}
+	
+	public void if_fcmpeq() { // comparação de igualdade de inteiros
+		filePrint.print("	if_fcmpeq ");
+	}
+	
+	public void if_fcmpne() { // comparação de valores diferentes inteiros
+		filePrint.print("	if_fcmpne ");
+	}
+	
+	public void if_fcmpgt() { // >
+		filePrint.print("	if_fcmpgt ");
+	}
+	
+	public void if_fcmpge() { // >=
+		filePrint.print("	if_fcmpge ");
+	}
+	
+	public void if_fcmplt() { // <
+		filePrint.print("	if_fcmplt ");
+	}
+	
+	public void if_fcmple() { // >=
+		filePrint.print("	if_fcmple ");
+	}
+	
+	/**
+	 * Expressoes Relacionais
+	 **/
+	public void menor(int type) {
+		if(type == Utils.FLOAT)
+			if_fcmplt();
+		else
+			if_icmplt();
+			
+		filePrint.println("L" + labels + " ; menor que real");
+		filePrint.println(
+					"	ldc 0\n" +
+					"	goto L" + (labels+1) + "\n" +
+					"L" + labels + ":\n" +
+					"	ldc 1\n" +
+					"L" + (labels+1) + ":"
+					);
+		labels += 2; // atualiza para o proximo label livre
+	}
+	
+	public void menorIgual(int type) {
+		if(type == Utils.FLOAT)
+			if_fcmple();
+		else
+			if_icmple();
+			
+		filePrint.println("L" + labels + " ; menor ou igual que real");
+		filePrint.println(
+				"	ldc 0\n" +
+				"	goto L" + (labels+1) + "\n" +
+				"L" + labels + ":\n" +
+				"	ldc 1\n" +
+				"L" + (labels+1) + ":"
+				);
+		labels += 2; // atualiza para o proximo label livre
+	}
+	
+	public void maior(int type) {
+		if(type == Utils.FLOAT)
+			if_fcmpgt();
+		else
+			if_icmpgt();
+			
+		filePrint.println("L" + labels + " ; maior que real");
+		filePrint.println(
+				"	ldc 0\n" +
+				"	goto L" + (labels+1) + "\n" +
+				"L" + labels + ":\n" +
+				"	ldc 1\n" +
+				"L" + (labels+1) + ":"
+				);
+		labels += 2; // atualiza para o proximo label livre
+	}
+	
+	public void maiorIgual(int type) {
+		if(type == Utils.FLOAT)
+			if_fcmpge();
+		else
+			if_icmpge();
+			
+		filePrint.println("L" + labels + " ; maio ou igual que real");
+		filePrint.println(
+				"	ldc 0\n" +
+				"	goto L" + (labels+1) + "\n" +
+				"L" + labels + ":\n" +
+				"	ldc 1\n" +
+				"L" + (labels+1) + ":"
+				);
+		labels += 2; // atualiza para o proximo label livre
+	}
+	
+	public void igualdade(int type) {
+		if(type == Utils.FLOAT)
+			if_fcmpeq();
+		else
+			if_icmpeq();
+		
+		filePrint.println("L" + labels + " ; igualdade");
+		filePrint.println(
+				"	ldc 0\n" +
+				"	goto L" + (labels+1) + "\n" +
+				"L" + labels + ":\n" +
+				"	ldc 1\n" +
+				"L" + (labels+1) + ":"
+				);
+		labels += 2; // atualiza para o proximo label livre
+	}
+	
+	public void desigualdade(int type) {
+		if(type == Utils.FLOAT)
+			if_fcmpne();
+		else
+			if_icmpne();
+		
+		filePrint.println("L" + labels + " ; igualdade");
+		filePrint.println(
+				"	ldc 0\n" +
+				"	goto L" + (labels+1) + "\n" +
+				"L" + labels + ":\n" +
+				"	ldc 1\n" +
+				"L" + (labels+1) + ":"
+				);
+		labels += 2; // atualiza para o proximo label livre
+	}
+	
+	public void converteOper1Float(int address, String nomeFunction) {
+		if(nomeFunction.equals("")) { // main
+			filePrint.println("fstore " + address + " ; salva o valor do segundo operando");
+			filePrint.println("i2f");
+			filePrint.print("fload " + address + " ; carrega o valor do segundo operando para a pilha");
+		} else { // função
+			int addressFunction = ((Function) symbolTable.get(nomeFunction)).getLocalVariables().size() + ((Function) symbolTable.get(nomeFunction)).getParameters().size() + 1;
+			
+			filePrint.println("fstore " + addressFunction + " ; salva o valor do segundo operando");
+			filePrint.println("i2f");
+			filePrint.print("fload " + addressFunction + " ; carrega o valor do segundo operando para a pilha");
+		}
+	}
+	
+	/**
+	 * comparadores logicos
+	 */
+	public void and() {
+		filePrint.println("iand");
+	}
+	
+	public void or() {
+		filePrint.println("ior");
+	}
+	
+	public void notBool() {
+		filePrint.println("	ifeq L" + labels + "; compara se é igual a zero\n"
+				+ "	ldc -1\n"
+				+ "	iadd\n"
+				+ "	goto L" +(labels+1) +"\n"
+				+ "L" + labels + ":\n"
+				+ "	ldc 1\n"
+				+ "	iadd\n"
+				+ "L" + (labels+1) + ":\n");
+	}
+	
+	public void minus(int type) {
+		if(type==Utils.FLOAT) {
+			filePrint.println("ldc -1.0");
+			multFloat();
+		} else {
+			filePrint.println("ldc -1");
+			multInteira();
+		}
+	}
+	
+	/**
+	 * operadores arritmeticos
+	 */
+	public void adicaoFloat() {
+		filePrint.println("fadd");
+	}
+	
+	public void adicaoInteira() {
+		filePrint.println("iadd");
+	}
+	
+	public void subFloat() {
+		filePrint.println("fsub");
+	}
+	
+	public void subInteira() {
+		filePrint.println("isub");
+	}
+	
+	public void multFloat() {
+		filePrint.println("fmul");
+	}
+	
+	public void multInteira() {
+		filePrint.println("imul");
+	}
+	
+	public void divFloat() {
+		filePrint.println("fdiv");
+	}
+	
+	public void divInteira() {
+		filePrint.println("idiv");
+	}
+	
+	/**
+	 * operações unarias
+	 */
+	
+	
+	/**
+	 * Operação condicional IF
+	 */
+	public void generationInitIfCode() {
+		filePrint.println("ifeq Lif" + labelsIf.push()+" ; inicializa o if");
+	}
+	
+	public void generationFinalIfCode() {
+		filePrint.println("ifeq Lif" + labelsIf.pop()+" ; finaliza o if");
+	}
+	
+	public void generationInitIfElseCode() {
+		filePrint.println("ifeq LIfE" + labelsIfE.push()+" ; inicializa o if");
+	}
+	
+	/**
+	 * Carregndo valores na pilha
+	 */
+	public void ldc(Object value) {
+		filePrint.println("ldc " + value + " ; carrega o valor na pilha"); 
+	}
+	
+	public void incremento(int type, int address) {
+		if(type==Utils.INT)
+			filePrint.println("iinc " + address + " 1");
+		else
+			filePrint.println("finc " + address + " 1.0");
+	}
+	
+	public void decremento(int type, int address) {
+		if(type==Utils.INT)
+			filePrint.println("iinc " + address + " -1");
+		else
+			filePrint.println("finc " + address + " -1.0");
 	}
 	
 	/**
