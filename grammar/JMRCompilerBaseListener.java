@@ -131,6 +131,18 @@ public class JMRCompilerBaseListener implements JMRCompilerListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterParametro(JMRCompilerParser.ParametroContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitParametro(JMRCompilerParser.ParametroContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterLista_parametros(JMRCompilerParser.Lista_parametrosContext ctx) { }
 	/**
 	 * {@inheritDoc}

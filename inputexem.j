@@ -6,44 +6,49 @@
 	.limit locals 6
 
 	astore 4
-	fstore 0
-	fstore 1
-	fstore 2
-	fstore 3
+	istore 0
+	istore 1
+	istore 2
+	istore 3
 	ldc 5	; carregar constante
 	istore 5
-	invokestatic exem.readFloat()F
-	fstore 0
-	invokestatic exem/readString()Ljava/lang/String;
+	invokestatic exem.readInt()I
+	istore 0
+	invokestatic exem.readString()Ljava/lang/String;
 	astore 4
 
 	return
 .end method
 
+.method public static read()I
+	.limit stack 3 ; tamanho maximo da pilha
+	.limit locals 1 ; numero maximo de variaveis locais ao metodo
 
-.method public static readReal()F
-	.limit stack 3
-	.limit locas 1
-
+	; inicio da função de entrada
 	new java/util/Scanner
-	dup	getstatic java/lang/System/in Ljava/io/InputStream;
+	dup ; duplica topo da pinlha
+	getstatic java/lang/System/in Ljava/io/InputStream;
 	invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V
 	astore 0
 	aload 0
-	invokevirtual java/util/Scanner/nextFloat()F
-	freturn
+	invokevirtual java/util/Scanner/nextInt()I
 
+	ireturn
 .end method
+
 .method public static readString()Ljava/lang/String;
 	.limit stack 5
 	.limit locals 1
 
 	new java/io/BufferedReader
-	dup	getstatic java/lang/System/in Ljava/io/InputStream;
+	dup
+	getstatic java/lang/System/in Ljava/io/InputStream;
 	invokespecial java/io/InputStreamReader/<init>(Ljava/io/InputStream;)V
 	invokespecial java/io/BufferedReader/<init>(Ljava/io/Reader;)V
-	astore 0	aload 0	invokevirtual java/io/BufferedReader/readLine()Ljava/lang/String;
+	astore 0
+	aload 0
+	invokevirtual java/io/BufferedReader/readLine()Ljava/lang/String;
+	
 	areturn
-
 .throws java/lang/Exception
-.end
+.end method

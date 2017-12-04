@@ -1,5 +1,5 @@
 Class exem;
-Float: a, b, c, d;
+Int: a, b, c, d;
 Str: str;
 final Int e = 5;
 

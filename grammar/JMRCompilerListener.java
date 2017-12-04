@@ -105,6 +105,16 @@ public interface JMRCompilerListener extends ParseTreeListener {
 	 */
 	void exitDecFuncs(JMRCompilerParser.DecFuncsContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link JMRCompilerParser#parametro}.
+	 * @param ctx the parse tree
+	 */
+	void enterParametro(JMRCompilerParser.ParametroContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link JMRCompilerParser#parametro}.
+	 * @param ctx the parse tree
+	 */
+	void exitParametro(JMRCompilerParser.ParametroContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link JMRCompilerParser#lista_parametros}.
 	 * @param ctx the parse tree
 	 */
