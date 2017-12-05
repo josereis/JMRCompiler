@@ -8,7 +8,7 @@ public class PilhaLabels {
 	private ArrayList<Integer> pilha;
 	
 	public int pop() {
-		int i = topo;
+		int i = (valor - 1);
 		pilha.remove(topo--);
 		
 		return i;
