@@ -1,7 +1,14 @@
 Class exem;
-Int: a, b, c, d;
+Int: a, b;
 
 Main {
-	a = 20 + 30;
-	print("Oi... Teste", a);
+	a = 2;
+	b = a*10;
+	
+	if(a > b){
+		print("Funciona ", a, " > ", b);
+	} else {
+		print("\n\nFuncionou seu porra!!\n\n", " ", a ," ", b," ", 2+3-9, "\n\n");
+	}
+	
 }
