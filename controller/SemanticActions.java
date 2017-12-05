@@ -20,7 +20,7 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	private GenerationOfCode generationOfCode;
 	private String nameFunction = "";
 	private PilhaIteracao iteracoes = new PilhaIteracao();
-	private boolean isDeclaredFunction = false, isMain = true, isReturn = false;
+	private boolean isDeclaredFunction = false, isMain = true, isReturn = false, isIfElse = false;
 	private Map<String, ObjectSymbolTable> symbolTable = new HashMap<String, ObjectSymbolTable>();
     
 	public GenerationOfCode getGenerationOfCode() {
@@ -194,31 +194,6 @@ public class SemanticActions extends JMRCompilerBaseListener {
 		this.nameFunction = "";
 	}
 	
-	/*private void enterForComand(JMRCompilerParser.ComandosContext ctx) {
-		iteracoes.push(1);
-		ObjectSymbolTable object = null;
-		if(ctx.atrib().getChildCount()==4) { // verifica se não é uma atribuição de incremento ou decremento
-			if(!isMain && ((Function) symbolTable.get(nameFunction)).isDeclaredId(ctx.atrib().ID().getText())) {
-				object = ((Function) symbolTable.get(nameFunction)).objectVariableOrParameter(ctx.atrib().ID().getText());
-			} else if(symbolTable.containsKey(ctx.atrib().ID().getText())) {
-				object = symbolTable.get(ctx.atrib().ID().getText());
-			} else {
-				System.out.println("ERRO: id não declarado para comando for");
-			}
-			
-			// inicaliza comando de for em codigo de 3 enderecos
-//			generationOfCode.generationHeaderFor();
-			// carrega o valor da variavel de teste
-			generationOfCode.loadVariable(object.getType(), object.getMemoryAddress());
-			
-			// verifi
-			
-			
-			
-		} else
-			System.out.println("ERRO: atribuição incorreta(não pode ser um incremento nem decremento).");
-	}*/
-	
 	private void enterReturnComand(JMRCompilerParser.ComandosContext ctx) {
 		if(isReturn) {
 			int typeFunction = symbolTable.get(nameFunction).getType(), typeBool = Utils.verifyctBoolType(ctx.bool(0), this);
@@ -238,19 +213,33 @@ public class SemanticActions extends JMRCompilerBaseListener {
 		if(ctx.getChild(0).getText().equals("return")) {
 			enterReturnComand(ctx); // trata o comando de retorno
 		} else if(ctx.getChild(0).getText().equals("if")) {
-			if(ctx.getChildCount() >= 8) { // caso seja o comando if_else
-				
-			} else {
-				if(Utils.verifyctBoolType((BoolContext) ctx.getChild(2), this)==Utils.BOOL) {
-					
-				} else
-					System.out.println("ERRO: tipos incompativeis na comparação do if");
-			}
+			if(Utils.verifyctBoolType((BoolContext) ctx.getChild(2), this)==Utils.BOOL) {	
+				if(ctx.getChildCount() >= 8) { // caso seja o comando if_else
+					isIfElse = true;
+					generationOfCode.generationInitIfElseCode();
+				} else {
+					generationOfCode.generationInitIfCode();
+				}
+			} else
+				System.out.println("ERRO: tipos incompativeis na comparação do if");
 		}
 	}
 	
 	public void exitComandos(JMRCompilerParser.ComandosContext ctx) {
-		 
+		if(ctx.getParent().getChild(0).getText().equals("if") && ctx.getParent().getChildCount()>=8 && isIfElse) {	
+			isIfElse = false;
+			generationOfCode.generationSaltoInternoIfElse();
+		} else {
+			if(ctx.getChild(0).getText().equals("return")) {
+				enterReturnComand(ctx); // trata o comando de retorno
+			} else if(ctx.getChild(0).getText().equals("if")) {
+				if(ctx.getChildCount() >= 8) { // caso seja o comando if_else
+					generationOfCode.generationFinalIfElseCode();
+				} else {
+					generationOfCode.generationFinalIfCode();
+				}
+			}
+		}
 	}
 	
 	/**
