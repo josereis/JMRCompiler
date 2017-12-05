@@ -56,18 +56,18 @@ main: 'Main' '{' comandos+ '}'
     ;
 
 comandos: 'if' '(' bool ')' '{'comandos+'}' ('else' '{'comandos+'}')?
-        | 'for' '(' atrib bool ';' bool ')' '{' comandos*'}'
-        | atrib
-        | funcao
+        | 'for' '(' atrib ';' bool ';' atrib ')' '{' comandos+'}'
+        | atrib ';'
+        | funcao ';'
         | print
         | read
         | 'break' ';'
         | 'return' (bool)? ';'
         ;
 
-atrib: ID Tk_Eq bool ';'
-     | ID '++' ';'
-     | ID '--' ';'
+atrib: ID Tk_Eq bool
+     | ID '++'
+     | ID '--'
      ;
 
 funcao: ID '(' bool(',' bool )* ')'

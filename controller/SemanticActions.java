@@ -1,15 +1,19 @@
 package controller;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.rmi.CORBA.Util;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import utils.Utils;
 import grammar.*;
+import grammar.JMRCompilerParser.AtribContext;
 import grammar.JMRCompilerParser.BoolContext;
+import grammar.JMRCompilerParser.ComandosContext;
 import grammar.JMRCompilerParser.FuncaoContext;
 import grammar.JMRCompilerParser.Lista_parametrosContext;
 import grammar.JMRCompilerParser.ParametroContext;
@@ -20,7 +24,7 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	private GenerationOfCode generationOfCode;
 	private String nameFunction = "";
 	private PilhaIteracao iteracoes = new PilhaIteracao();
-	private boolean isDeclaredFunction = false, isMain = true, isReturn = false, isIfElse = false;
+	private boolean isDeclaredFunction = false, isMain = true, isReturn = false, isIfElse = false, isFor = false, isBreak = false;
 	private Map<String, ObjectSymbolTable> symbolTable = new HashMap<String, ObjectSymbolTable>();
     
 	public GenerationOfCode getGenerationOfCode() {
@@ -196,7 +200,7 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	
 	private void enterReturnComand(JMRCompilerParser.ComandosContext ctx) {
 		if(isReturn) {
-			int typeFunction = symbolTable.get(nameFunction).getType(), typeBool = Utils.verifyctBoolType(ctx.bool(0), this);
+			int typeFunction = symbolTable.get(nameFunction).getType(), typeBool = Utils.verifyctBoolType(ctx.bool(), this);
 			if(typeBool == typeFunction) {
 				if(typeFunction==Utils.INT && typeBool==Utils.FLOAT) {
 					generationOfCode.coercaoIntToFloat();
@@ -222,6 +226,26 @@ public class SemanticActions extends JMRCompilerBaseListener {
 				}
 			} else
 				System.out.println("ERRO: tipos incompativeis na comparação do if");
+		} else if(ctx.getChild(0).getText().equals("for")) {
+			isFor = true;
+			isBreak = true;
+			
+			AtribContext atribContext = (AtribContext) ctx.getChild(6);
+			
+			ArrayList<ComandosContext> comandos = new ArrayList<ComandosContext>();
+			for(int i = 9; i < ctx.getChildCount()-1; i++) {
+				comandos.add((ComandosContext) ctx.getChild(i));
+			}
+			
+			int qf = ctx.getChildCount() - 1;
+			for(int i = qf; i > qf-5; i--) {
+				ctx.removeLastChild();
+			}
+			
+			for(ComandosContext c: comandos) {
+				ctx.addChild(c);
+			}
+			ctx.addChild(atribContext);
 		}
 	}
 	
@@ -238,6 +262,9 @@ public class SemanticActions extends JMRCompilerBaseListener {
 				} else {
 					generationOfCode.generationFinalIfCode();
 				}
+			} else if(ctx.getChild(0).getText().equals("for")) {
+				isBreak = false;
+				generationOfCode.generationFinalFor();
 			}
 		}
 	}
@@ -254,7 +281,6 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	public void exitMain(JMRCompilerParser.MainContext ctx) {
 		isMain = false;
 		generationOfCode.endMain();
-//		generationOfCode.generationConstructFinalRead();
 	}
 	
 	/**
@@ -348,7 +374,16 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	}
 	
 	public void exitAtrib(JMRCompilerParser.AtribContext ctx) {
-		
+		if(ctx.getParent().getChild(0).getText().equals("for") && isFor) {
+			isFor = false;
+			generationOfCode.generationInitForCode();
+			if(Utils.verifyctBoolType((BoolContext) ctx.getParent().getChild(4), this)==Utils.BOOL) {
+				generationOfCode.generationTestForCode();
+			} else {
+				// erro
+			}
+			
+		}
 	}
 	
 	public SemanticActions(String sourceFileDirectory) {

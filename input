@@ -2,13 +2,13 @@ Class exem;
 Int: a, b;
 
 Main {
-	a = 2;
-	b = a*10;
-	
-	if(a > b){
-		print("Funciona ", a, " > ", b);
-	} else {
-		print("\n\nFuncionou seu porra!!\n\n", " ", a ," ", b," ", 2+3-9, "\n\n");
+	for(a = 1; a < 10 ;a++) {
+		for(b = 1; b < 10; b++){
+			print(b, " ");
+		}
+		print("\n");
+		if(a==2){
+			a = 9;
+		}
 	}
-	
 }

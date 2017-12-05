@@ -631,12 +631,33 @@ public class GenerationOfCode {
 	
 	public void generationSaltoInternoIfElse() {
 		int flag = labelsIfE.pop();
-		filePrint.println("goto LIfE" + labelsIfE.push() +" ; finaliza if do else");
+		filePrint.println("	goto LIfE" + labelsIfE.push() +" ; finaliza if do else");
 		filePrint.println("LIfE" + flag +": ; inicializa o else");
 	}
 	
 	public void generationFinalIfElseCode() {
 		filePrint.println("	LIfE" + labelsIfE.pop()+": ; finaliza o if_else(else)");
+	}
+	
+	/**
+	 * Comandos de repetição for
+	 */
+	public void generationInitForCode() {
+		filePrint.println("LFor" + labelsFor.push() + ": ; incia o comando for");
+	}
+	
+	public void generationTestForCode() {
+		filePrint.println("	ifeq LFor" + labelsFor.push() + " ; testa a condição do for com valor 0-false, 1-true");
+	}
+	
+	public void generationFinalFor() { // salta para o inicio do comando for
+		int flag = labelsFor.pop();
+		filePrint.println("	goto LFor" + (labelsFor.pop()) + " ; salta pro inicio do for, para verificar a condição booleana");
+		filePrint.println("LFor" + flag + ": ; fim do loop");
+	}
+	
+	public void generationBreak() {
+		filePrint.println("	goto LFor" + labelsFor.getTopo() + " ; salta para fora do for (comando break)");		
 	}
 	
 	/**
