@@ -123,7 +123,7 @@ public class GenerationOfCode {
 					declareConstant(((Constant) object).getValueObject());
 			}
 			
-			variableSalve(object.getType(), object.getMemoryAddress()); // salva a constante como uma variavel local do main
+//			variableSalve(object.getType(), object.getMemoryAddress()); // salva a constante como uma variavel local do main
 		}
 	}
 	
@@ -618,15 +618,25 @@ public class GenerationOfCode {
 	 * Operação condicional IF
 	 */
 	public void generationInitIfCode() {
-		filePrint.println("	ifeq Lif" + labelsIf.push()+" ; inicializa o if");
+		filePrint.println("	ifeq LIf" + labelsIf.push()+" ; inicializa o if");
 	}
 	
 	public void generationFinalIfCode() {
-		filePrint.println("	ifeq Lif" + labelsIf.pop()+" ; finaliza o if");
+		filePrint.println("LIf" + labelsIf.pop()+": ; finaliza o if");
 	}
 	
 	public void generationInitIfElseCode() {
-		filePrint.println("	ifeq LIfE" + labelsIfE.push()+" ; inicializa o if");
+		filePrint.println("	ifeq LIfE" + labelsIfE.push()+" ; inicializa o if_else");
+	}
+	
+	public void generationSaltoInternoIfElse() {
+		int flag = labelsIfE.pop();
+		filePrint.println("goto LIfE" + labelsIfE.push() +" ; finaliza if do else");
+		filePrint.println("LIfE" + flag +": ; inicializa o else");
+	}
+	
+	public void generationFinalIfElseCode() {
+		filePrint.println("	LIfE" + labelsIfE.pop()+": ; finaliza o if_else(else)");
 	}
 	
 	/**
