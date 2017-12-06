@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class Function extends ObjectSymbolTable {
 	private String functionName;
-	
+	private int memoryAddressFree = 0;
 	private Map<String, Parameter> parameters;
 	private Map<String, Variable> localVariables;
 
@@ -34,6 +34,8 @@ public class Function extends ObjectSymbolTable {
 	}
 	
 	public void addLocalVariable(String id, Variable variable) {
+		variable.setMemoryAddress(memoryAddressFree++);
+		
 		localVariables.put(id, variable);
 	}
 

@@ -1,11 +1,14 @@
 Class exem;
-Int: a, b, c, d;
-final Int e = 5;
-final Float h = 10;
-final Str i = "algo";
-final Bool j = false;
+Int: a, b;
 
 Main {
-	c = 10;
-	print("Teste de print", 2, 1.1111, "teste");
+	for(a = 1; a < 10 ;a++) {
+		for(b = 1; b < 10; b++){
+			print(b, " ");
+		}
+		print("\n");
+		if(a==2){
+			a = 9;
+		}
+	}
 }

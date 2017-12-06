@@ -43,28 +43,31 @@ valor returns [int type, Object value]: INT {$type = 1; $value = Integer.parseIn
      			}
      ;
 
-decFuncs: tipoF ID '(' lista_parametros? ')' '{' decVars* decConsts* comandos+ '}'
+decFuncs: tipoF ID '(' lista_parametros? ')' '{' decVars* comandos+ '}'
         ;
 
-lista_parametros: tipo ID (',' tipo ID)*
+parametro: tipo ID
+	;
+
+lista_parametros: parametro (',' parametro)*
 	;
 
 main: 'Main' '{' comandos+ '}'
     ;
 
 comandos: 'if' '(' bool ')' '{'comandos+'}' ('else' '{'comandos+'}')?
-        | 'for' '(' atrib bool ';' bool ')' '{' comandos*'}'
-        | atrib
-        | funcao
+        | 'for' '(' atrib ';' bool ';' atrib ')' '{' comandos+'}'
+        | atrib ';'
+        | funcao ';'
         | print
         | read
         | 'break' ';'
         | 'return' (bool)? ';'
         ;
 
-atrib: ID Tk_Eq bool ';'
-     | ID '++' ';'
-     | ID '--' ';'
+atrib: ID Tk_Eq bool
+     | ID '++'
+     | ID '--'
      ;
 
 funcao: ID '(' bool(',' bool )* ')'
