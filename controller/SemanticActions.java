@@ -68,16 +68,16 @@ public class SemanticActions extends JMRCompilerBaseListener {
     }
 
 	public void enterPrograma(JMRCompilerParser.ProgramaContext ctx) {
-		if(!Utils.isReservedWord(ctx.ID().getText())) { // verifica se o nome para o programa È uma palavra reservada
+		if(!Utils.isReservedWord(ctx.ID().getText())) { // verifica se o nome para o programa √© uma palavra reservada
 			generationOfCode.setProgramName(ctx.ID().getText());
-			generationOfCode.generateFileJasmin(); // inicializa o arquivo '.j' para escrita do codigo de trÍs endereÁos referente ao programa
+			generationOfCode.generateFileJasmin(); // inicializa o arquivo '.j' para escrita do codigo de tr√™s endere√ßos referente ao programa
 			generationOfCode.initHeader(); // insere codigo de header do programa
 		} else
-			System.out.println("ERRO: o nome usado para identificaÁ„o do programa consiste em uma palavra reservada");
+			System.out.println("ERRO: o nome usado para identifica√ß√£o do programa consiste em uma palavra reservada");
     }
 	
 	public void exitPrograma(JMRCompilerParser.ProgramaContext ctx) {
-		generationOfCode.closeFile(); // Finaliza objeto que ser· responsavel pela geraÁ„o de codigo
+		generationOfCode.closeFile(); // Finaliza objeto que ser√° responsavel pela gera√ß√£o de codigo
 	}
 	
 	/**
@@ -87,32 +87,32 @@ public class SemanticActions extends JMRCompilerBaseListener {
 		for(TerminalNode id: ctx.listaIDs().ID()) {
 			// verifica se consiste em uma palavra reservada
 			if(!Utils.isReservedWord(id.getText())) {
-				// verifica se ID j· pertence a tabela de simbolos
+				// verifica se ID j√° pertence a tabela de simbolos
 				if(!symbolTable.containsKey(id.getText())) {
 					Variable variable = new Variable(Utils.VARIABLE, addressMemoryFree++);
 					
 					variable.setType(ctx.tipo.type);
 					variable.setValueObject(null);
-					// verifica o escopo da variavel, ou seja, verifica se È local ou global
-					if(isDeclaredFunction) { // caso a daclaraÁ„o esteja sendo feita dentro de uma funÁ„o, o que categoriza a variavel como local
+					// verifica o escopo da variavel, ou seja, verifica se √© local ou global
+					if(isDeclaredFunction) { // caso a daclara√ß√£o esteja sendo feita dentro de uma fun√ß√£o, o que categoriza a variavel como local
 						addressMemoryFree--;
 						variable.setMemoryAddress(-1);
 						variable.setScope(Variable.LOCAL);
 						String nameFunction = ctx.parent.getChild(1).getText();
 						
 						ObjectSymbolTable function = symbolTable.get(nameFunction);
-						// verifica se realmente trata-se de uma funÁ„o e se o id nao foi declarado nesta funÁ„o
+						// verifica se realmente trata-se de uma fun√ß√£o e se o id nao foi declarado nesta fun√ß√£o
 						if((function instanceof Function) && !((Function)function).isDeclaredId(id.getText())) {
 							((Function)function).addLocalVariable(id.getText(), variable);
 						}
 					} else
 						symbolTable.put(id.getText(), variable);
 				} else
-					System.out.println("ERRO (linha: " + id.getSymbol().getLine() + "): ID usado para indentificaÁ„o da variavel j· foi usado.");
+					System.out.println("ERRO (linha: " + id.getSymbol().getLine() + "): ID usado para indentifica√ß√£o da variavel j√° foi usado.");
 				
 				
 			} else
-				System.out.println("ERRO (linha: " + id.getSymbol().getLine() +"): o ID usado para identificaÁ„o da variavel consiste em uma palavra reservada");
+				System.out.println("ERRO (linha: " + id.getSymbol().getLine() +"): o ID usado para identifica√ß√£o da variavel consiste em uma palavra reservada");
 				
 		}
 	}
@@ -125,7 +125,7 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	 * @description: SALVA AS CONSTANTES NA TABELA DE SIMBOLOS
 	 */
 	public void enterDecConsts(JMRCompilerParser.DecConstsContext ctx) {
-		// verifica se o id È ou n„o uma palavra reservada
+		// verifica se o id √© ou n√£o uma palavra reservada
 		if(!Utils.isReservedWord(ctx.ID().getText())) {
 			// verifica id ja foi declarado e pertence a tabela de simbolos
 			if(!symbolTable.containsKey(ctx.ID().getText())) {
@@ -138,7 +138,7 @@ public class SemanticActions extends JMRCompilerBaseListener {
 					constant.setType(ctx.tipo().type);
 					constant.setValueObject(ctx.valor().value);
 				} else {
-					System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): o valor passado È incompativel com o tipo declarado para a constante.");
+					System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): o valor passado √© incompativel com o tipo declarado para a constante.");
 					addressMemoryFree--;
 					
 					return;
@@ -146,9 +146,9 @@ public class SemanticActions extends JMRCompilerBaseListener {
 				
 				symbolTable.put(ctx.ID().getText(), constant);
 			} else
-				System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): ID usado para indentificaÁ„o da constante j· foi usado.");
+				System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): ID usado para indentifica√ß√£o da constante j√° foi usado.");
 		} else
-			System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() +"): o ID usado para identificaÁ„o da constante consiste em uma palavra reservada");
+			System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() +"): o ID usado para identifica√ß√£o da constante consiste em uma palavra reservada");
 	}
 	
 	public void exitDecConsts(JMRCompilerParser.DecConstsContext ctx) {
@@ -156,10 +156,10 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	}
 	
 	/**
-	 * @description: SALVA AS FUN«’ES DECLARADAS NA TABELA DE SIMBOLOS
+	 * @description: SALVA AS FUN√á√ïES DECLARADAS NA TABELA DE SIMBOLOS
 	 */
 	public void enterDecFuncs(JMRCompilerParser.DecFuncsContext ctx) {
-		// verifica se id È ou n„o uma palavra reservada
+		// verifica se id √© ou n√£o uma palavra reservada
 		if(!Utils.isReservedWord(ctx.ID().getText())) {
 			// verifica se id ja foi declarado (pertence a tabela de simbolos)
 			if(!symbolTable.containsKey(ctx.ID().getText())) {
@@ -167,11 +167,11 @@ public class SemanticActions extends JMRCompilerBaseListener {
 				this.isDeclaredFunction = true;
 				this.nameFunction = ctx.ID().getText();
 				
-				// cria a funÁ„o
+				// cria a fun√ß√£o
 				Function function = new Function(Utils.FUNCTION, addressMemoryFree++);
 				
 				function.setType(ctx.tipoF().type);
-				// verifica se possui ou n„o algum parametro (s„o opicionais)
+				// verifica se possui ou n√£o algum parametro (s√£o opicionais)
 				if(ctx.lista_parametros() != null) {
 					for(ParametroContext parametro: ctx.lista_parametros().parametro()) {
 						if(!function.getParameters().containsKey(parametro.ID().getText())) {
@@ -185,9 +185,9 @@ public class SemanticActions extends JMRCompilerBaseListener {
 				}
 				generationOfCode.generationHeaderFunction(this.nameFunction);
 			} else
-				System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): ID usado para indentificaÁ„o da funÁ„o j· foi usado.");
+				System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): ID usado para indentifica√ß√£o da fun√ß√£o j√° foi usado.");
 		} else
-			System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() +"): o ID usado para identificaÁ„o da funÁ„o consiste em uma palavra reservada");
+			System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() +"): o ID usado para identifica√ß√£o da fun√ß√£o consiste em uma palavra reservada");
 	}
 	
 	public void exitDecFuncs(JMRCompilerParser.DecFuncsContext ctx) {
@@ -208,9 +208,9 @@ public class SemanticActions extends JMRCompilerBaseListener {
 					// codigo sem coercao
 				}
 			} else
-				System.out.println("ERRO: tipo de retorno incompativel com o tipo definido na funÁ„o");
+				System.out.println("ERRO: tipo de retorno incompativel com o tipo definido na fun√ß√£o");
 		} else
-			System.out.println("ERRO: return sendo usado fora do escopo de uma funÁ„o.");
+			System.out.println("ERRO: return sendo usado fora do escopo de uma fun√ß√£o.");
 	}
 	
 	public void enterComandos(JMRCompilerParser.ComandosContext ctx) {
@@ -225,7 +225,7 @@ public class SemanticActions extends JMRCompilerBaseListener {
 					generationOfCode.generationInitIfCode();
 				}
 			} else
-				System.out.println("ERRO: tipos incompativeis na comparaÁ„o do if");
+				System.out.println("ERRO: tipos incompativeis na compara√ß√£o do if");
 		} else if(ctx.getChild(0).getText().equals("for")) {
 			isFor = true;
 			isBreak = true;
@@ -238,7 +238,7 @@ public class SemanticActions extends JMRCompilerBaseListener {
 			}
 			
 			int qf = ctx.getChildCount() - 1;
-			for(int i = qf; i > qf-5; i--) {
+			for(int i = qf; i > 5; i--) {
 				ctx.removeLastChild();
 			}
 			
@@ -284,7 +284,7 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	}
 	
 	/**
-	 * @description: TRATAMENTO DA REALIZA«√O DO COMANDO READ
+	 * @description: TRATAMENTO DA REALIZA√á√ÉO DO COMANDO READ
 	 */
 	public void enterRead(JMRCompilerParser.ReadContext ctx) {
 		// para verificar todos os ids passados para a leitura
@@ -296,11 +296,11 @@ public class SemanticActions extends JMRCompilerBaseListener {
 				} else if(symbolTable.containsKey(id.getText())){
 					object = symbolTable.get(id.getText());
 				} else
-					System.out.println("ERRO (linha:" + id.getSymbol().getLine() + "): id especificado n„o corresponde a uma variavel declarada.");
+					System.out.println("ERRO (linha:" + id.getSymbol().getLine() + "): id especificado n√£o corresponde a uma variavel declarada.");
 				
 				generationOfCode.generationRead(object.getType(), object.getMemoryAddress());
 			} else
-				System.out.println("ERRO (linha:" + id.getSymbol().getLine() + "): id especificado consiste em uma constante, ou funÁ„o, e seu valor n„o pode ser alterado.");
+				System.out.println("ERRO (linha:" + id.getSymbol().getLine() + "): id especificado consiste em uma constante, ou fun√ß√£o, e seu valor n√£o pode ser alterado.");
 		}
 	}
 	
@@ -309,13 +309,13 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	 }
 	
 	/**
-	 * @description: TRATAMENTO DA REALIZA«√O DO COMANDO PRINT
+	 * @description: TRATAMENTO DA REALIZA√á√ÉO DO COMANDO PRINT
 	 */
 	public void enterPrint(JMRCompilerParser.PrintContext ctx) {
 		for(JMRCompilerParser.BoolContext obj: ctx.bool()) {
-			generationOfCode.initGenerationPrint(); // inicializa o codigo para print de uma express„o
+			generationOfCode.initGenerationPrint(); // inicializa o codigo para print de uma express√£o
 			
-			generationOfCode.execPrint(Utils.verifyctBoolType(obj, this)); // chama funÁ„o de print de acordo com o tipo passado
+			generationOfCode.execPrint(Utils.verifyctBoolType(obj, this)); // chama fun√ß√£o de print de acordo com o tipo passado
 		}
 		generationOfCode.printNewLine();
 	}
@@ -325,52 +325,52 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	}
 	
 	/**
-	 * @description: TRATAMENTO DA REALIZA«√O DO COMANDO DE ATRIBUI«√O
+	 * @description: TRATAMENTO DA REALIZA√á√ÉO DO COMANDO DE ATRIBUI√á√ÉO
 	 */
 	public void enterAtrib(JMRCompilerParser.AtribContext ctx) {
 		// verifica se realmente trata-se de uma variavel (ou parametro, caso esteja no escopo de uma variavel local)
 		if(symbolTable.get(ctx.ID().getText()).getTypeObjectSimbolTable() != Utils.CONSTANT) {
 			ObjectSymbolTable object = null;
 			
-			// verifica se est· em uma funÁ„o que n„o se trata do main
+			// verifica se est√° em uma fun√ß√£o que n√£o se trata do main
 			if(isDeclaredFunction) {
 				Function function = ((Function)symbolTable.get(nameFunction));
 				// verificar se trata-se de um parametro ou variavel local
 				if(function.isDeclaredId(ctx.ID().getText())) {
 					object = function.objectVariableOrParameter(ctx.ID().getText());
-				} else if(symbolTable.containsKey(ctx.ID().getText())) { // caso n„o seja uma variavel local, verifica se consiste em uma variavel global
+				} else if(symbolTable.containsKey(ctx.ID().getText())) { // caso n√£o seja uma variavel local, verifica se consiste em uma variavel global
 					object = symbolTable.get(ctx.ID().getText());
 				}
 			} else
 				object = symbolTable.get(ctx.ID().getText());
 			 
 			if(object != null) {
-				String op = ctx.getChild(1).getText(); // guarda o operador de atribuiÁ„o da regra
+				String op = ctx.getChild(1).getText(); // guarda o operador de atribui√ß√£o da regra
 				if(op.equals("=")) {
 					int typeExprBool = Utils.verifyctBoolType((JMRCompilerParser.BoolContext) ctx.getChild(2), this);
 					
 					if(object.getType()==typeExprBool) {
 						generationOfCode.variableSalve(typeExprBool, object.getMemoryAddress()); // salva variavel na memoria
 					} else if(object.getType()==Utils.FLOAT && typeExprBool==Utils.INT) {
-						generationOfCode.variableSalveCoercaoIntToFloat(object.getMemoryAddress()); // salvar variavel, porem deve-se fazer a coerÁ„o de tipos de inteiro para real
+						generationOfCode.variableSalveCoercaoIntToFloat(object.getMemoryAddress()); // salvar variavel, porem deve-se fazer a coer√ß√£o de tipos de inteiro para real
 					} else
-						System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() +"): tipos incompativeis para realizaÁ„o da atribuiÁ„o");
+						System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() +"): tipos incompativeis para realiza√ß√£o da atribui√ß√£o");
 				} else {
 					if(object.getType()==Utils.INT || object.getType()==Utils.FLOAT) {
 						if(op.equals("++")) {
-							// atribuiÁ„o de incremento (pensar em como avaliar com real ou inteiro para faze a atribuiÁ„o de maneira correta).
+							// atribui√ß√£o de incremento (pensar em como avaliar com real ou inteiro para faze a atribui√ß√£o de maneira correta).
 							generationOfCode.incremento(object.getType(), object.getMemoryAddress());
 						} else {
-							// atribuiÁ„o de decremento (pensar em como avaliar com real ou inteiro para faze a atribuiÁ„o de maneira correta).
+							// atribui√ß√£o de decremento (pensar em como avaliar com real ou inteiro para faze a atribui√ß√£o de maneira correta).
 							generationOfCode.decremento(object.getType(), object.getMemoryAddress());
 						}
 					} else
-						System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): tipo incompativel para operaÁ„o de atribuiÁ„o (ou ++ ou --).");
+						System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): tipo incompativel para opera√ß√£o de atribui√ß√£o (ou ++ ou --).");
 				}
 			} else
-				System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): ID n„o declarado.");
+				System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): ID n√£o declarado.");
 		} else
-			System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): ID informado identifica uma constante, e portanto seu valor n„o pode ser alterado");
+			System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): ID informado identifica uma constante, e portanto seu valor n√£o pode ser alterado");
 	}
 	
 	public void exitAtrib(JMRCompilerParser.AtribContext ctx) {
