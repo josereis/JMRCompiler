@@ -216,7 +216,9 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	public void enterComandos(JMRCompilerParser.ComandosContext ctx) {
 		if(ctx.getChild(0).getText().equals("return")) {
 			enterReturnComand(ctx); // trata o comando de retorno
-		} else if(ctx.getChild(0).getText().equals("if")) {
+		} else if(ctx.getChild(0).getText().equals("break")){
+                        generationOfCode.generationBreak();
+                } else if(ctx.getChild(0).getText().equals("if")) {
 			if(Utils.verifyctBoolType((BoolContext) ctx.getChild(2), this)==Utils.BOOL) {	
 				if(ctx.getChildCount() >= 8) { // caso seja o comando if_else
 					isIfElse = true;
