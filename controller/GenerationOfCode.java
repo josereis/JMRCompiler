@@ -121,6 +121,8 @@ public class GenerationOfCode {
 					loadConstantBool((boolean) ((Constant) object).getValueObject());
 				} else
 					declareConstant(((Constant) object).getValueObject());
+				
+				variableSalve(object.getType(), object.getMemoryAddress()); // salva a constante como uma variavel local do main
 			}
 			
 //			variableSalve(object.getType(), object.getMemoryAddress()); // salva a constante como uma variavel local do main
