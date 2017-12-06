@@ -198,16 +198,21 @@ public class SemanticActions extends JMRCompilerBaseListener {
 		this.nameFunction = "";
 	}
 	
+	public void enterFuncao(JMRCompilerParser.FuncaoContext ctx) {
+		if(symbolTable.get(ctx.ID().getText())!=null && symbolTable.get(ctx.ID().getText()).getTypeObjectSimbolTable()==Utils.FUNCTION) {
+			
+		} else
+			System.out.println("ERRO: não corresponde a uma chamada de função");
+	}
+	
+	public void exitFuncao(JMRCompilerParser.FuncaoContext ctx) {
+		
+	}
+	
 	private void enterReturnComand(JMRCompilerParser.ComandosContext ctx) {
 		if(isReturn) {
 			int typeFunction = symbolTable.get(nameFunction).getType(), typeBool = Utils.verifyctBoolType(ctx.bool(), this);
-			if(typeBool == typeFunction) {
-				if(typeFunction==Utils.INT && typeBool==Utils.FLOAT) {
-					generationOfCode.coercaoIntToFloat();
-				} else {
-					// codigo sem coercao
-				}
-			} else
+			if(typeBool != typeFunction)
 				System.out.println("ERRO: tipo de retorno incompativel com o tipo definido na função");
 		} else
 			System.out.println("ERRO: return sendo usado fora do escopo de uma função.");
