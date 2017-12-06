@@ -1,14 +1,25 @@
 Class exem;
 Int: a, b;
+Str: c;
+
+final Int max = 10;
+
+Void teste(Int x, Float y, Str nome) {
+	Int: d;
+	
+	for(d=1; d < x; d++) {
+		print("O ", nome," eh um viadinho ", d*y, " vezes\n");	
+	}	
+}
+
+Int fat() {
+	return 10;
+}
 
 Main {
-	for(a = 1; a < 10 ;a++) {
-		for(b = 1; b < 10; b++){
-			print(b, " ");
-		}
-		print("\n");
-		if(a==2){
-			a = 9;
-		}
-	}
+	print("DIGITE O NUMERO INTEIRO X: ");
+	read(a);
+	
+	b = fat();
+	print("\n\nretorno = ", b, "\n\n");
 }

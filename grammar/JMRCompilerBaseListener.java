@@ -83,18 +83,6 @@ public class JMRCompilerBaseListener implements JMRCompilerListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterListaIDs2(JMRCompilerParser.ListaIDs2Context ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitListaIDs2(JMRCompilerParser.ListaIDs2Context ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterDecConsts(JMRCompilerParser.DecConstsContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -186,6 +174,18 @@ public class JMRCompilerBaseListener implements JMRCompilerListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitAtrib(JMRCompilerParser.AtribContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterParametros(JMRCompilerParser.ParametrosContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitParametros(JMRCompilerParser.ParametrosContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

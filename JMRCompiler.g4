@@ -28,10 +28,9 @@ tipoF returns [int type]: tipo {$type = $tipo.type;}
 listaIDs[int type]: ID (',' ID)*
         ;
 
-listaIDs2: ID (',' ID)*
-        ;
 decConsts: 'final' tipo ID Tk_Eq valor ';'
          ;
+         
 valor returns [int type, Object value]: INT {$type = 1; $value = Integer.parseInt($INT.text);}
      | REAL {$type = 2; $value = Float.parseFloat($REAL.text);}
      | STRING {$type = 3; $value = $STRING.text;}
@@ -69,8 +68,11 @@ atrib: ID Tk_Eq bool
      | ID '++'
      | ID '--'
      ;
+     
+parametros: bool(',' bool )*
+	;
 
-funcao: ID '(' bool(',' bool )* ')'
+funcao: ID '(' parametros? ')'
       ;
 
 bool: bool '||' join
@@ -118,7 +120,7 @@ factor: funcao
 print: 'print' '(' bool(',' bool )* ')' ';'
      ;
 
-read: 'read' '(' listaIDs2 ')' ';'
+read: 'read' '(' ID (',' ID)* ')' ';'
     ;
         
         

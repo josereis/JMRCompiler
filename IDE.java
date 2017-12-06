@@ -133,8 +133,8 @@ public class IDE extends javax.swing.JFrame {
     private void okActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okActionPerformed
         String x = codigo.getText();
         Main result = new Main();
-        result.menu(x);
-        resposta.setText(result.z);      
+//        result.menu(x);
+//        resposta.setText(result.z);      
     }//GEN-LAST:event_okActionPerformed
 
     private void fecharActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fecharActionPerformed

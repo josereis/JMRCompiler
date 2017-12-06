@@ -65,16 +65,6 @@ public interface JMRCompilerListener extends ParseTreeListener {
 	 */
 	void exitListaIDs(JMRCompilerParser.ListaIDsContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link JMRCompilerParser#listaIDs2}.
-	 * @param ctx the parse tree
-	 */
-	void enterListaIDs2(JMRCompilerParser.ListaIDs2Context ctx);
-	/**
-	 * Exit a parse tree produced by {@link JMRCompilerParser#listaIDs2}.
-	 * @param ctx the parse tree
-	 */
-	void exitListaIDs2(JMRCompilerParser.ListaIDs2Context ctx);
-	/**
 	 * Enter a parse tree produced by {@link JMRCompilerParser#decConsts}.
 	 * @param ctx the parse tree
 	 */
@@ -154,6 +144,16 @@ public interface JMRCompilerListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAtrib(JMRCompilerParser.AtribContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link JMRCompilerParser#parametros}.
+	 * @param ctx the parse tree
+	 */
+	void enterParametros(JMRCompilerParser.ParametrosContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link JMRCompilerParser#parametros}.
+	 * @param ctx the parse tree
+	 */
+	void exitParametros(JMRCompilerParser.ParametrosContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link JMRCompilerParser#funcao}.
 	 * @param ctx the parse tree

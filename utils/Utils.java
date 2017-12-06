@@ -209,10 +209,11 @@ public class Utils {
 			if(ctx.getChild(1).getText().equals("*")) {
 				if((typeTermo==INT || typeTermo==FLOAT)&&(typeUnary==INT || typeUnary==FLOAT)) {
 					if(typeTermo==FLOAT || typeUnary==FLOAT) {
-						if(typeTermo == FLOAT)
+						if(typeTermo==INT) {
 							semanticActions.getGenerationOfCode().converteOper1Float(semanticActions.getAddressMemoryFree(), semanticActions.getNameFunction());
-						else
+						} else if(typeUnary==INT) {
 							semanticActions.getGenerationOfCode().coercaoIntToFloat();
+						}
 						
 						semanticActions.getGenerationOfCode().multFloat();
 						
@@ -276,7 +277,7 @@ public class Utils {
 		if(ctx.getChildCount() == 3) { // trata-se de uma expressão -> '(' bool ')'
 			return verifyctBoolType((JMRCompilerParser.BoolContext) ctx.getChild(1), semanticActions);
 		} else if(ctx.getChild(0) instanceof JMRCompilerParser.FuncaoContext) { // trata-se da chamada de função
-			Function func = ((Function) semanticActions.getSymbolTable().get(semanticActions.getNameFunction()));
+			Function func = ((Function) semanticActions.getSymbolTable().get(ctx.getChild(0).getChild(0).getText()));
 			
 			return func.getType();
 		} else if(ctx.getChild(0) instanceof JMRCompilerParser.ValorContext) {
@@ -310,7 +311,7 @@ public class Utils {
 			}
 		} else { // trata-se de uma ID
 			ObjectSymbolTable object = null;
-			if(semanticActions.getIsMain()) { // verifica se o escopo é global (podendo ser uma constante ou variavel
+			if(semanticActions.getIsMain() && !semanticActions.getIsFunction()) { // verifica se o escopo é global (podendo ser uma constante ou variavel
 				if(semanticActions.getSymbolTable().containsKey(ctx.getChild(0).getText())) {
 					object = semanticActions.getSymbolTable().get(ctx.getChild(0).getText());
 					
@@ -328,18 +329,14 @@ public class Utils {
 				Function func = ((Function) semanticActions.getSymbolTable().get(semanticActions.getNameFunction()));
 				if(func.isDeclaredId(ctx.getChild(0).getText())) { // verifica se trata-se de um parametro ou variavel local
 					object = func.objectVariableOrParameter(ctx.getChild(0).getText());
-					if(object.getTypeObjectSimbolTable() == PARAMETER)
-						return ((Parameter) object).getType();
-					else
-						return ((Variable) object).getType();
+					semanticActions.getGenerationOfCode().loadVariable(object.getType(), object.getMemoryAddress());
+					
+					return object.getType();
 				} else if(semanticActions.getSymbolTable().containsKey(ctx.getChild(0).getText())) {
 					object = semanticActions.getSymbolTable().get(ctx.getChild(0).getText());
+					semanticActions.getGenerationOfCode().loadVariable(object.getType(), object.getMemoryAddress());
 					
-					if(object.getTypeObjectSimbolTable() == CONSTANT) {
-						return ((Constant)object).getType();
-					} else if(object.getTypeObjectSimbolTable() == VARIABLE) {
-						return ((Variable)object).getType();
-					}
+					return object.getType();
 				} else
 					System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): o id não corresponde a uma variavel ou constante declarado.");
 			}

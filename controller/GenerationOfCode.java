@@ -150,7 +150,7 @@ public class GenerationOfCode {
 	}
 	
 	public void coercaoIntToFloat() {
-			filePrint.println("	i2f");
+			filePrint.println("	i2f ; converte valor inteiro pra valor real");
 	}
 	
 	public void variableSalveCoercaoIntToFloat(int address) {
@@ -257,71 +257,75 @@ public class GenerationOfCode {
 		filePrint.println("	ldc " + value + "\t; carregar constante");
 	}
 	
-	private void generatedFunctionReadInt() {
-		filePrint.println(".method public static read()I\n"
-						+ "	.limit stack 3 ; tamanho maximo da pilha\n"
-						+ "	.limit locals 1 ; numero maximo de variaveis locais ao metodo\n\n"
-						+ "	; inicio da função de entrada\n"
-						+ "	new java/util/Scanner\n"
-						+ "	dup ; duplica topo da pinlha\n"
-						+ "	getstatic java/lang/System/in Ljava/io/InputStream;\n"
-						+ "	invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V\n"
-						+ "	astore 0\n"
-						+ "	aload 0\n"
-						+ "	invokevirtual java/util/Scanner/nextInt()I\n\n"
-						+ "	ireturn\n"
-						+ ".end method\n"
-				);
-	}
+	public void generatedFunctionReadInt(){
+        this.filePrint.println(".method public static read()I\n"
+        		+ "	.limit stack 3 ; tamanho maximo da pilha\n"
+        		+ "	.limit locals 1 ; numero maximo de variaveis locais ao metodo\n"
+        		+ "\n"
+        		+ "	; inicio da função de entrada\n"
+        		+ "	new java/util/Scanner\n"
+        		+ "	dup ; \n"
+        		+ "	getstatic java/lang/System/in Ljava/io/InputStream;\n"
+        		+ "	invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V\n"
+        		+ "	astore 0\n"
+        		+ "	aload 0\n"
+        		+ "	invokevirtual java/util/Scanner/nextInt()I\n"
+        		+ "\n"
+        		+ "	ireturn\n"
+        		+ ".end method");
+    }
 	
 	private void generatedFunctionReadFloat() {
-		filePrint.println("\n.method public static readReal()F\n"
-						+ "	.limit stack 3\n"
-						+ "	.limit locas 1\n\n"
-						+ "	new java/util/Scanner\n"
-						+ "	dup\n"
-						+ "	getstatic java/lang/System/in Ljava/io/InputStream;\n"
-						+ "	invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V\n"
-						+ "	astore 0\n"
-						+ "	aload 0\n"
-						+ "	invokevirtual java/util/Scanner/nextFloat()F\n"
-						+ "	freturn\n\n"
-						+ ".end method"
-				);
+		this.filePrint.println("\n.method public static read()F\n" +
+                ".limit stack 3\n" +
+                ".limit locals 1\n" +
+                "\n" +
+                "	new java/util/Scanner\n" +
+                "	dup\n" +
+                "	getstatic java/lang/System/in Ljava/io/InputStream;\n" +
+                "	invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V\n" +
+                "	astore_0\n" +
+                "	aload_0\n" +
+                "	invokevirtual java/util/Scanner/nextFloat()F\n" +
+                "	freturn\n" +
+                "\n" +
+                ".end method");
 	}
 
 	private void generatedFunctionReadString() {
-		filePrint.println(".method public static readString()Ljava/lang/String;\n"
+		filePrint.println(".method public static read()Ljava/lang/String;\n"
 						+ "	.limit stack 5\n"
 						+ "	.limit locals 1\n\n"
 						+ "	new java/io/BufferedReader\n"
 						+ "	dup\n"
+						+ "	new java/io/InputStreamReader\n"
+						+ "	dup\n"
 						+ "	getstatic java/lang/System/in Ljava/io/InputStream;\n"
-						+ "	invokespecial java/io/InputStreamReader/<init>(Ljava/io/InputStream;)V\n"
+                        + "	invokespecial java/io/InputStreamReader/<init>(Ljava/io/InputStream;)V\n"
                         + "	invokespecial java/io/BufferedReader/<init>(Ljava/io/Reader;)V\n"
                         + "	astore 0\n"
                         + "	aload 0\n"
                         + "	invokevirtual java/io/BufferedReader/readLine()Ljava/lang/String;\n\n"
                         + "	areturn\n"
-                        + ".throws java/lang/Exception\n"
+                        + "	.throws java/lang/Exception\n"
                         + ".end method"
 						);
 	}
 	
-	private void readInt(int address) {
-		filePrint.println("	invokestatic " + programName + ".readInt()I");
+	public void readInt(int address) {
+		filePrint.println("	invokestatic " + programName + ".read()I");
 		filePrint.println("	istore " + address);
 		codeReadInt = true;
 	}
 	
-	private void readFloat(int address) {
-		filePrint.println("	invokestatic " + programName + ".readFloat()F");
+	public void readFloat(int address) {
+		filePrint.println("	invokestatic " + programName + ".read()F");
 		filePrint.println("	fstore " + address);
 		codeReadFloat = true;
 	}
 	
-	private void readString(int address) {
-		filePrint.println("	invokestatic " + programName + ".readString()Ljava/lang/String;");
+	public void readString(int address) {
+		filePrint.println("	invokestatic " + programName + ".read()Ljava/lang/String;");
 		filePrint.println("	astore " + address);
 		codeReadString = true;
 	}
@@ -346,12 +350,12 @@ public class GenerationOfCode {
 		Function function = (Function) symbolTable.get(functionName);
 		
 		if(function != null) {
-			filePrint.println("\n.method public static " + functionName + "(");
+			filePrint.print("\n.method public static " + functionName + "(");
 			for(Parameter p: function.getParameters().values()) {
 				filePrint.print(typeObject(p.getType()));
 			}
-			filePrint.print(")" + typeObject(function.getType()));
-			filePrint.println("	.limit stack 10\n	.limit locals " + (function.getLocalVariables().size()) + "\n");
+			filePrint.println(")" + typeObject(function.getType()));
+			filePrint.println("	.limit stack 10\n	.limit locals " + (function.getMemoryAddressFree()+10) + "\n");
 		}
 	}
 	
@@ -534,13 +538,13 @@ public class GenerationOfCode {
 		if(nomeFunction.equals("")) { // main
 			filePrint.println("	fstore " + address + " ; salva o valor do segundo operando");
 			filePrint.println("	i2f");
-			filePrint.print("	fload " + address + " ; carrega o valor do segundo operando para a pilha");
+			filePrint.println("	fload " + address + " ; carrega o valor do segundo operando para a pilha");
 		} else { // função
 			int addressFunction = ((Function) symbolTable.get(nomeFunction)).getLocalVariables().size() + ((Function) symbolTable.get(nomeFunction)).getParameters().size() + 1;
 			
 			filePrint.println("	fstore " + addressFunction + " ; salva o valor do segundo operando");
 			filePrint.println("	i2f");
-			filePrint.print("	fload " + addressFunction + " ; carrega o valor do segundo operando para a pilha");
+			filePrint.println("	fload " + addressFunction + " ; carrega o valor do segundo operando para a pilha");
 		}
 	}
 	
@@ -660,6 +664,17 @@ public class GenerationOfCode {
 	
 	public void generationBreak() {
 		filePrint.println("	goto LFor" + labelsFor.getTopo() + " ; salta para fora do for (comando break)");		
+	}
+	
+	public void generationCallFunction(String nameFunction) {
+		Function function = (Function) symbolTable.get(nameFunction);
+		if(function != null) {
+			filePrint.print("\n	invokestatic " + programName + "." + nameFunction + "(");
+			for(Parameter p: function.getParameters().values()) {
+				filePrint.print(typeObject(p.getType()));
+			}
+			filePrint.println(")" + typeObject(function.getType()));
+		}
 	}
 	
 	/**

@@ -5,12 +5,16 @@ import java.util.Map;
 
 public class Function extends ObjectSymbolTable {
 	private String functionName;
-	private int memoryAddressFree = -1;
+	private int memoryAddressFree = 0;
 	private Map<String, Parameter> parameters;
 	private Map<String, Variable> localVariables;
-
+	
 	public String getFunctionName() {
 		return functionName;
+	}
+	
+	public int getMemoryAddressFree() {
+		return memoryAddressFree;
 	}
 
 	public void setFunctionName(String functionName) {

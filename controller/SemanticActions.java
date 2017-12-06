@@ -23,8 +23,7 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	private int addressMemoryFree = 0;
 	private GenerationOfCode generationOfCode;
 	private String nameFunction = "";
-	private PilhaIteracao iteracoes = new PilhaIteracao();
-	private boolean isDeclaredFunction = false, isMain = true, isReturn = false, isIfElse = false, isFor = false, isBreak = false;
+	private boolean isFunction = false, isMain = false, isReturn = false, isIfElse = false, isFor = false, isBreak = false, isRead = false;
 	private Map<String, ObjectSymbolTable> symbolTable = new HashMap<String, ObjectSymbolTable>();
     
 	public GenerationOfCode getGenerationOfCode() {
@@ -35,8 +34,8 @@ public class SemanticActions extends JMRCompilerBaseListener {
 		this.generationOfCode = generationOfCode;
 	}
 	
-    public boolean getIsDeclaredFunction() {
-    	return isDeclaredFunction;
+    public boolean getIsFunction() {
+    	return isFunction;
     }
     
     public boolean getIsMain() {
@@ -48,7 +47,7 @@ public class SemanticActions extends JMRCompilerBaseListener {
     }
     
     public void setIsDeclaredFunction(boolean isFunction) {
-		this.isDeclaredFunction = isFunction;
+		this.isFunction = isFunction;
 	}
 
 	public int getAddressMemoryFree() {
@@ -94,9 +93,9 @@ public class SemanticActions extends JMRCompilerBaseListener {
 					variable.setType(ctx.tipo.type);
 					variable.setValueObject(null);
 					// verifica o escopo da variavel, ou seja, verifica se é local ou global
-					if(isDeclaredFunction) { // caso a daclaração esteja sendo feita dentro de uma função, o que categoriza a variavel como local
+					if(isFunction) { // caso a daclaração esteja sendo feita dentro de uma função, o que categoriza a variavel como local
 						addressMemoryFree--;
-						variable.setMemoryAddress(-1);
+						
 						variable.setScope(Variable.LOCAL);
 						String nameFunction = ctx.parent.getChild(1).getText();
 						
@@ -105,8 +104,9 @@ public class SemanticActions extends JMRCompilerBaseListener {
 						if((function instanceof Function) && !((Function)function).isDeclaredId(id.getText())) {
 							((Function)function).addLocalVariable(id.getText(), variable);
 						}
-					} else
+					} else {
 						symbolTable.put(id.getText(), variable);
+					}
 				} else
 					System.out.println("ERRO (linha: " + id.getSymbol().getLine() + "): ID usado para indentificação da variavel já foi usado.");
 				
@@ -164,11 +164,11 @@ public class SemanticActions extends JMRCompilerBaseListener {
 			// verifica se id ja foi declarado (pertence a tabela de simbolos)
 			if(!symbolTable.containsKey(ctx.ID().getText())) {
 				this.isReturn = true; // habilita uso do return
-				this.isDeclaredFunction = true;
+				this.isFunction = true;
 				this.nameFunction = ctx.ID().getText();
 				
 				// cria a função
-				Function function = new Function(Utils.FUNCTION, addressMemoryFree++);
+				Function function = new Function(Utils.FUNCTION, -1);
 				
 				function.setType(ctx.tipoF().type);
 				// verifica se possui ou não algum parametro (são opicionais)
@@ -183,6 +183,7 @@ public class SemanticActions extends JMRCompilerBaseListener {
 							System.out.println("ERRO: o id do parametro ja foi declarado na funcao.");
 					}
 				}
+				symbolTable.put(this.nameFunction, function);
 				generationOfCode.generationHeaderFunction(this.nameFunction);
 			} else
 				System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): ID usado para indentificação da função já foi usado.");
@@ -192,28 +193,56 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	
 	public void exitDecFuncs(JMRCompilerParser.DecFuncsContext ctx) {
 		this.isReturn = false;
-		this.isDeclaredFunction = false;
+		this.isFunction = false;
 		
 		generationOfCode.generationFooterFunction(this.nameFunction);
 		this.nameFunction = "";
 	}
 	
 	public void enterFuncao(JMRCompilerParser.FuncaoContext ctx) {
-		if(symbolTable.get(ctx.ID().getText())!=null && symbolTable.get(ctx.ID().getText()).getTypeObjectSimbolTable()==Utils.FUNCTION) {
+		ObjectSymbolTable object = symbolTable.get(ctx.ID().getText());
+		if(object!=null && object.getTypeObjectSimbolTable()==Utils.FUNCTION) {
+			isFunction = true;
+			nameFunction = ctx.ID().getText();
 			
+			if((ctx.parametros().bool().size() > 0)&&(ctx.parametros().bool().size()==((Function)object).getParameters().size())) {
+				// para cada express�o passada como parametro
+				int i = 0;
+				for(Parameter parameter: ((Function)object).getParameters().values()) {
+					int typeParameter = parameter.getType();
+					int typeBool = Utils.verifyctBoolType(ctx.parametros().bool().get(i++), this);
+					
+					if(typeBool==typeParameter) {
+						// n�o gera erro
+					} else if(typeBool==Utils.INT && typeParameter==Utils.FLOAT) {
+						generationOfCode.coercaoIntToFloat();
+					} else
+						System.out.println("ERRO(linha: "+ ctx.ID().getSymbol().getLine() +"): o tipo do valor passado como parametro � incompativel com o tipo que foi declarado.");
+				}
+			} else
+				System.out.println("ERRO(linha: "+ ctx.ID().getSymbol().getLine() +"): quantidade de parametros passados incompativel com a quantidade de paramentros declarados na funcao");
+			
+			// faz chamada para gera��o de cogido da chamada de funcao
+			generationOfCode.generationCallFunction(ctx.ID().getText());
 		} else
-			System.out.println("ERRO: n�o corresponde a uma chamada de fun��o");
+			System.out.println("ERRO(linha: "+ ctx.ID().getSymbol().getLine() +"): n�o corresponde a uma chamada de fun��o");
 	}
 	
 	public void exitFuncao(JMRCompilerParser.FuncaoContext ctx) {
-		
+//		nameFunction = "";
+		isFunction = false;
 	}
 	
 	private void enterReturnComand(JMRCompilerParser.ComandosContext ctx) {
 		if(isReturn) {
 			int typeFunction = symbolTable.get(nameFunction).getType(), typeBool = Utils.verifyctBoolType(ctx.bool(), this);
 
-			if(typeBool != typeFunction)
+			if(typeBool == typeFunction) {
+				// gera retorno pois sao compativeis
+			} else if((typeBool==Utils.INT) && (typeFunction==Utils.FLOAT)) {
+				// gera coercao e retorna
+				generationOfCode.coercaoIntToFloat();
+			} else
 				System.out.println("ERRO: tipo de retorno incompativel com o tipo definido na fun��o");
 		} else
 			System.out.println("ERRO: return sendo usado fora do escopo de uma função.");
@@ -295,8 +324,9 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	 * @description: TRATAMENTO DA REALIZAÇÃO DO COMANDO READ
 	 */
 	public void enterRead(JMRCompilerParser.ReadContext ctx) {
+		isRead = true;
 		// para verificar todos os ids passados para a leitura
-		for(TerminalNode id: ctx.listaIDs2().ID()) {
+		for(TerminalNode id: ctx.ID()) {
 			if(!(symbolTable.get(id.getText()) instanceof Constant) && !(symbolTable.get(id.getText()) instanceof Function)) {
 				ObjectSymbolTable object = null;
 				if(!isMain && ((Function) symbolTable.get(nameFunction)).isDeclaredId(id.getText())) {
@@ -337,11 +367,11 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	 */
 	public void enterAtrib(JMRCompilerParser.AtribContext ctx) {
 		// verifica se realmente trata-se de uma variavel (ou parametro, caso esteja no escopo de uma variavel local)
-		if(symbolTable.get(ctx.ID().getText()).getTypeObjectSimbolTable() != Utils.CONSTANT) {
+//		if(symbolTable.get(ctx.ID().getText()).getTypeObjectSimbolTable() != Utils.CONSTANT) {
 			ObjectSymbolTable object = null;
 			
 			// verifica se está em uma função que não se trata do main
-			if(isDeclaredFunction) {
+			if(!isMain && isFunction) {
 				Function function = ((Function)symbolTable.get(nameFunction));
 				// verificar se trata-se de um parametro ou variavel local
 				if(function.isDeclaredId(ctx.ID().getText())) {
@@ -377,8 +407,8 @@ public class SemanticActions extends JMRCompilerBaseListener {
 				}
 			} else
 				System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): ID não declarado.");
-		} else
-			System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): ID informado identifica uma constante, e portanto seu valor não pode ser alterado");
+//		} else
+//			System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): ID informado identifica uma constante, e portanto seu valor não pode ser alterado");
 	}
 	
 	public void exitAtrib(JMRCompilerParser.AtribContext ctx) {
