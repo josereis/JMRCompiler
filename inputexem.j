@@ -2,72 +2,32 @@
 .super java/lang/Object
 
 
-.method public static teste(IFLjava/lang/String;)V
+.method public static fat(I)I
 	.limit stack 10
-	.limit locals 13
+	.limit locals 11
 
-	ldc 1 ; carrega o valor na pilha
-	istore 3
-LFor0: ; incia o comando for
- iload 3
  iload 0
-	if_icmplt L0 ; menor que real
+	ldc 1 ; carrega o valor na pilha
+	if_icmple L0 ; menor ou igual que real
 	ldc 0
 	goto L1
 L0:
 	ldc 1
 L1:
-	ifeq LFor1 ; testa a condição do for com valor 0-false, 1-true
+	ifeq LIfE0 ; inicializa o if_else
+	ldc 1 ; carrega o valor na pilha
+	goto LIfE1 ; finaliza if do else
+LIfE0: ; inicializa o else
+ iload 0
+	imul
+ iload 0
+	ldc 1 ; carrega o valor na pilha
+	isub
 
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	ldc "O " ; carrega o valor na pilha
-	invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
-
-
-	getstatic java/lang/System/out Ljava/io/PrintStream;
- aload 2
-	invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
-
-
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	ldc " eh um viadinho " ; carrega o valor na pilha
-	invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
-
-
-	getstatic java/lang/System/out Ljava/io/PrintStream;
- iload 3
- fload 1
-	fstore 5 ; salva o valor do segundo operando
-	i2f
-	fload 5 ; carrega o valor do segundo operando para a pilha
-	fmul
-	invokevirtual java/io/PrintStream/print(F)V
-
-
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	ldc " vezes\n" ; carrega o valor na pilha
-	invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
-
-
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	ldc ""
-	invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
-
-	iinc 3 1
-	goto LFor0 ; salta pro inicio do for, para verificar a condição booleana
-LFor1: ; fim do loop
-
-
-	return
-.end method
-
-
-.method public static fat()I
-	.limit stack 10
-	.limit locals 10
-
-	ldc 10 ; carrega o valor na pilha
-	ldc 10 ; carrega o valor na pilha
+	invokestatic exem.fat(I)I
+ iload 0
+	imul
+	LIfE1: ; finaliza o if_else(else)
 
 
 	ireturn
@@ -75,10 +35,10 @@ LFor1: ; fim do loop
 
 .method public static main([Ljava/lang/String;)V
 	.limit stack 100 ; aloca o tamanho para a pilha, ou seja, declara a pilha a ser usada.
-	.limit locals 4
+	.limit locals 3
 
 	ldc 10	; carregar constante
-	istore 3
+	istore 2
 
 	getstatic java/lang/System/out Ljava/io/PrintStream;
 	ldc "DIGITE O NUMERO INTEIRO X: " ; carrega o valor na pilha
@@ -92,11 +52,12 @@ LFor1: ; fim do loop
 	invokestatic exem.read()I
 	istore 0
 	istore 1
+ iload 0
 
-	invokestatic exem.fat()I
+	invokestatic exem.fat(I)I
 
 	getstatic java/lang/System/out Ljava/io/PrintStream;
-	ldc "\n\nretorno = " ; carrega o valor na pilha
+	ldc "fat = " ; carrega o valor na pilha
 	invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 
 
@@ -106,7 +67,7 @@ LFor1: ; fim do loop
 
 
 	getstatic java/lang/System/out Ljava/io/PrintStream;
-	ldc "\n\n" ; carrega o valor na pilha
+	ldc "\n" ; carrega o valor na pilha
 	invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 
 
