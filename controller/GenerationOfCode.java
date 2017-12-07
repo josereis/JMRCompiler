@@ -340,24 +340,22 @@ public class GenerationOfCode {
 		}
 	}
 	
-	public void generationHeaderFunction(String functionName) {
-		Function function = (Function) symbolTable.get(functionName);
+	public void generationHeaderFunction(String nameFunction) {
+		Function function = (Function) symbolTable.get(nameFunction);
 		
 		if(function != null) {
-			filePrint.println("\n.method public static " + functionName + "(");
+			filePrint.println("\n.method public static " + nameFunction + "(");
 			for(Parameter p: function.getParameters().values()) {
 				filePrint.print(typeObject(p.getType()));
 			}
-			filePrint.print(")" + typeObject(function.getType()));
+			filePrint.println(")" + typeObject(function.getType()));
 			filePrint.println("	.limit stack 10\n	.limit locals " + (function.getLocalVariables().size()) + "\n");
 		}
 	}
 	
-	public void generationFooterFunction(String nameFuction) {
-		Function function = (Function) symbolTable.get(nameFuction);
-		
+	public void generationFooterFunction(int typeReturn) {
 		filePrint.println("\n");
-		switch (function.getType()) {
+		switch (typeReturn) {
 			case Utils.INT: filePrint.println("	ireturn");
 				break;
 			case Utils.FLOAT: filePrint.println("	freturn");

@@ -1,7 +1,7 @@
 package models;
 
 public class Parameter extends ObjectSymbolTable {
-	private Object valueObject;
+	private Object valueObject; // pode ser removido
 	
 	public Object getValueObject() {
 		return valueObject;

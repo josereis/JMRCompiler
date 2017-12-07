@@ -22,6 +22,9 @@ public class Function extends ObjectSymbolTable {
 	}
 
 	public void addParameter(String id, Parameter parameter) {
+		// seta o endereco local do parametro na funcao
+		parameter.setMemoryAddress(memoryAddressFree++);
+		
 		parameters.put(id, parameter);
 	}
 	

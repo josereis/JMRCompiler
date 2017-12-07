@@ -88,32 +88,48 @@ public class SemanticActions extends JMRCompilerBaseListener {
 			// verifica se consiste em uma palavra reservada
 			if(!Utils.isReservedWord(id.getText())) {
 				// verifica se ID já pertence a tabela de simbolos
-				if(!symbolTable.containsKey(id.getText())) {
-					Variable variable = new Variable(Utils.VARIABLE, addressMemoryFree++);
-					
-					variable.setType(ctx.tipo.type);
-					variable.setValueObject(null);
-					// verifica o escopo da variavel, ou seja, verifica se é local ou global
-					if(isDeclaredFunction) { // caso a daclaração esteja sendo feita dentro de uma função, o que categoriza a variavel como local
-						addressMemoryFree--;
-						variable.setMemoryAddress(-1);
+//				if(!symbolTable.containsKey(id.getText())) {
+//					Variable variable = new Variable(Utils.VARIABLE, addressMemoryFree++);
+//					
+//					variable.setType(ctx.tipo().type);
+//					// verifica o escopo da variavel, ou seja, verifica se é local ou global
+//					if(isDeclaredFunction) { // caso a daclaração esteja sendo feita dentro de uma função, o que categoriza a variavel como local
+//						addressMemoryFree--;
+//						variable.setScope(Variable.LOCAL); // adiciona escopo da variavel
+//						Function function = (Function) symbolTable.get(nameFunction);
+//						
+//						// verifica se o id nao foi declarado nesta função
+//						if(!((Function)function).isDeclaredId(id.getText())) {
+//							((Function)function).addLocalVariable(id.getText(), variable);
+//						}
+//					} else
+//						symbolTable.put(id.getText(), variable);
+//				} else
+//					System.out.println("ERRO (linha: " + id.getSymbol().getLine() + "): ID usado para indentificação da variavel já foi usado.");
+				
+				Variable variable = new Variable(Utils.VARIABLE, -1);
+				if(isDeclaredFunction) {
+					Function function = (Function) symbolTable.get(nameFunction);
+					if(function!=null && !function.isDeclaredId(id.getText())) {
 						variable.setScope(Variable.LOCAL);
-						String nameFunction = ctx.parent.getChild(1).getText();
+						function.addLocalVariable(id.getText(), variable);
+					} else {
+						System.out.println("ERRO (linha: " + id.getSymbol().getLine() +"): o ID usado para identificação da variavel no escopo da função "+ nameFunction +" ja foi declarado.");
+					}					
+				} else {
+					if(!symbolTable.containsKey(id.getText())) {
+						variable.setScope(Variable.GLOBAL);
+						variable.setMemoryAddress(addressMemoryFree++);
 						
-						ObjectSymbolTable function = symbolTable.get(nameFunction);
-						// verifica se realmente trata-se de uma função e se o id nao foi declarado nesta função
-						if((function instanceof Function) && !((Function)function).isDeclaredId(id.getText())) {
-							((Function)function).addLocalVariable(id.getText(), variable);
-						}
-					} else
+						// adiciona a variavel a tabela de simbolos
 						symbolTable.put(id.getText(), variable);
-				} else
-					System.out.println("ERRO (linha: " + id.getSymbol().getLine() + "): ID usado para indentificação da variavel já foi usado.");
-				
-				
-			} else
+					} else {
+						System.out.println("ERRO (linha: " + id.getSymbol().getLine() +"): o ID usado para identificação ja foi declarado.");
+					}
+				}
+			} else {
 				System.out.println("ERRO (linha: " + id.getSymbol().getLine() +"): o ID usado para identificação da variavel consiste em uma palavra reservada");
-				
+			}
 		}
 	}
 	
@@ -163,29 +179,27 @@ public class SemanticActions extends JMRCompilerBaseListener {
 		if(!Utils.isReservedWord(ctx.ID().getText())) {
 			// verifica se id ja foi declarado (pertence a tabela de simbolos)
 			if(!symbolTable.containsKey(ctx.ID().getText())) {
-				this.isReturn = true; // habilita uso do return
+				this.isReturn = true;
 				this.isDeclaredFunction = true;
 				this.nameFunction = ctx.ID().getText();
 				
-				// cria a função
-				Function function = new Function(Utils.FUNCTION, addressMemoryFree++);
+				// cria nova funçao que deve ser persistida na tabela de simbolos
+				Function function = new Function(Utils.FUNCTION, -1);
 				
-				function.setType(ctx.tipoF().type);
-				// verifica se possui ou não algum parametro (são opicionais)
-				if(ctx.lista_parametros() != null) {
-					for(ParametroContext parametro: ctx.lista_parametros().parametro()) {
-						if(!function.getParameters().containsKey(parametro.ID().getText())) {
-							Parameter p = new Parameter(Utils.PARAMETER, -1);
-							
-							p.setType(parametro.tipo().type);
-							function.addParameter(parametro.ID().getText(), p);
-						} else
-							System.out.println("ERRO: o id do parametro ja foi declarado na funcao.");
-					}
-				}
-				generationOfCode.generationHeaderFunction(this.nameFunction);
+				// verifica e seta os parametros para a função, casos existam
+				for(ParametroContext p: ctx.lista_parametros().parametro()) {
+					// incializa a entidade que representa um parametro
+					Parameter parameter = new Parameter(Utils.PARAMETER, -1);
+					parameter.setType(p.tipo().type); // seta o tipo do parametro
+					// adiciona o parametro a funcao
+					function.addParameter(p.ID().getText(), parameter);
+				}				
+				// salva função na tabela de simbolos
+				symbolTable.put(nameFunction, function);
+				
+				// chamo função para geração de codigo intermediario para cabeçalho de função
 			} else
-				System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() + "): ID usado para indentificação da função já foi usado.");
+				System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() +"): o ID usado para identificação da função ja foi declarado e ja pertence a tabela de simbolos.");
 		} else
 			System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() +"): o ID usado para identificação da função consiste em uma palavra reservada");
 	}
@@ -193,9 +207,9 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	public void exitDecFuncs(JMRCompilerParser.DecFuncsContext ctx) {
 		this.isReturn = false;
 		this.isDeclaredFunction = false;
+		Function function = (Function) symbolTable.get(nameFunction);
 		
-		generationOfCode.generationFooterFunction(this.nameFunction);
-		this.nameFunction = "";
+		generationOfCode.generationFooterFunction(function.getType()); this.nameFunction = "";
 	}
 	
 	private void enterReturnComand(JMRCompilerParser.ComandosContext ctx) {
