@@ -12,6 +12,10 @@ public class Function extends ObjectSymbolTable {
 	public String getFunctionName() {
 		return functionName;
 	}
+	
+	public int getSizeMemoryLocals() {
+		return (memoryAddressFree + 1);
+	}
 
 	public void setFunctionName(String functionName) {
 		this.functionName = functionName;

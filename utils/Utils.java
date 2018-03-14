@@ -4,6 +4,7 @@ import java.awt.Container;
 
 import controller.SemanticActions;
 import grammar.JMRCompilerParser;
+import grammar.JMRCompilerParser.FuncaoContext;
 import models.Constant;
 import models.Function;
 import models.ObjectSymbolTable;
@@ -276,9 +277,20 @@ public class Utils {
 		if(ctx.getChildCount() == 3) { // trata-se de uma expressão -> '(' bool ')'
 			return verifyctBoolType((JMRCompilerParser.BoolContext) ctx.getChild(1), semanticActions);
 		} else if(ctx.getChild(0) instanceof JMRCompilerParser.FuncaoContext) { // trata-se da chamada de função
-			Function func = ((Function) semanticActions.getSymbolTable().get(semanticActions.getNameFunction()));
-			
-			return func.getType();
+			ObjectSymbolTable func = semanticActions.getSymbolTable().get(((FuncaoContext) ctx.getChild(0)).ID().getText());
+			if(func!=null && func.getTypeObjectSimbolTable()==Utils.FUNCTION) {
+				semanticActions.setIsDeclaredFunction(true);
+				semanticActions.setNameFunction(((FuncaoContext) ctx.getChild(0)).ID().getText());
+				
+				if(((FuncaoContext) ctx.getChild(0)).bool().size()>0 && (((FuncaoContext) ctx.getChild(0)).bool().size()==((Function)func).getParameters().size())) {
+					int i = 0;
+				} else
+					System.out.println("ERRO(linha: "+ ctx.ID().getSymbol().getLine() +"): quantidade de parametros passados incompativel com a quantidade de paramentros declarados na funcao");
+				
+				return func.getType();
+			} else {
+				System.out.println("ERRO(linha: "+ ctx.ID().getSymbol().getLine() +"): não corresponde a uma chamada de função");
+			}
 		} else if(ctx.getChild(0) instanceof JMRCompilerParser.ValorContext) {
 			switch (((JMRCompilerParser.ValorContext) ctx.getChild(0)).type) {
 				case INT: {
@@ -310,7 +322,7 @@ public class Utils {
 			}
 		} else { // trata-se de uma ID
 			ObjectSymbolTable object = null;
-			if(semanticActions.getIsMain()) { // verifica se o escopo é global (podendo ser uma constante ou variavel
+			if(semanticActions.getIsMain() && !semanticActions.getIsDeclaredFunction()) { // verifica se o escopo é global (podendo ser uma constante ou variavel
 				if(semanticActions.getSymbolTable().containsKey(ctx.getChild(0).getText())) {
 					object = semanticActions.getSymbolTable().get(ctx.getChild(0).getText());
 					

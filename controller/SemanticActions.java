@@ -35,16 +35,24 @@ public class SemanticActions extends JMRCompilerBaseListener {
 		this.generationOfCode = generationOfCode;
 	}
 	
-    public boolean getIsDeclaredFunction() {
-    	return isDeclaredFunction;
-    }
-    
-    public boolean getIsMain() {
+	public boolean getIsMain() {
     	return isMain;
     }
     
+    public void setIsMain(boolean isMain) {
+    	this.isMain = isMain;
+    }
+	
     public String getNameFunction() {
     	return nameFunction;
+    }
+    
+    public void setNameFunction(String nameFunction) {
+    	this.nameFunction = nameFunction;
+    }
+    
+    public boolean getIsDeclaredFunction() {
+    	return isDeclaredFunction;
     }
     
     public void setIsDeclaredFunction(boolean isFunction) {
@@ -185,19 +193,21 @@ public class SemanticActions extends JMRCompilerBaseListener {
 				
 				// cria nova funçao que deve ser persistida na tabela de simbolos
 				Function function = new Function(Utils.FUNCTION, -1);
-				
-				// verifica e seta os parametros para a função, casos existam
-				for(ParametroContext p: ctx.lista_parametros().parametro()) {
-					// incializa a entidade que representa um parametro
-					Parameter parameter = new Parameter(Utils.PARAMETER, -1);
-					parameter.setType(p.tipo().type); // seta o tipo do parametro
-					// adiciona o parametro a funcao
-					function.addParameter(p.ID().getText(), parameter);
-				}				
+				if(ctx.lista_parametros() != null) {
+					// verifica e seta os parametros para a função, casos existam
+					for(ParametroContext p: ctx.lista_parametros().parametro()) {
+						// incializa a entidade que representa um parametro
+						Parameter parameter = new Parameter(Utils.PARAMETER, -1);
+						parameter.setType(p.tipo().type); // seta o tipo do parametro
+						// adiciona o parametro a funcao
+						function.addParameter(p.ID().getText(), parameter);
+					}
+				}
 				// salva função na tabela de simbolos
 				symbolTable.put(nameFunction, function);
 				
 				// chamo função para geração de codigo intermediario para cabeçalho de função
+				generationOfCode.generationHeaderFunction(nameFunction);
 			} else
 				System.out.println("ERRO (linha: " + ctx.ID().getSymbol().getLine() +"): o ID usado para identificação da função ja foi declarado e ja pertence a tabela de simbolos.");
 		} else
@@ -207,24 +217,63 @@ public class SemanticActions extends JMRCompilerBaseListener {
 	public void exitDecFuncs(JMRCompilerParser.DecFuncsContext ctx) {
 		this.isReturn = false;
 		this.isDeclaredFunction = false;
-		Function function = (Function) symbolTable.get(nameFunction);
 		
-		generationOfCode.generationFooterFunction(function.getType()); this.nameFunction = "";
+		this.nameFunction = "";
+		generationOfCode.generationFooterFunction();
+	}
+	
+	public void enterFuncao(JMRCompilerParser.FuncaoContext ctx) {
+		if(ctx.getParent() instanceof JMRCompilerParser.ComandosContext) {
+			ObjectSymbolTable object = symbolTable.get(ctx.ID().getText());
+			if(object!=null && object.getTypeObjectSimbolTable()==Utils.FUNCTION) {
+				isDeclaredFunction = true;
+				nameFunction = ctx.ID().getText();
+				
+				if((ctx.bool().size() > 0)&&(ctx.bool().size()==((Function)object).getParameters().size())) {
+					// para cada expressão passada como parametro
+					int i = 0;
+					for(Parameter parameter: ((Function)object).getParameters().values()) {
+						int typeParameter = parameter.getType();
+						int typeBool = Utils.verifyctBoolType(ctx.bool().get(i++), this);
+						
+						if(typeBool==typeParameter) {
+							// não gera erro
+						} else if(typeBool==Utils.INT && typeParameter==Utils.FLOAT) {
+							generationOfCode.coercaoIntToFloat();
+						} else
+							System.out.println("ERRO(linha: "+ ctx.ID().getSymbol().getLine() +"): o tipo do valor passado como parametro é incompativel com o tipo que foi declarado.");
+					}
+				} else
+					System.out.println("ERRO(linha: "+ ctx.ID().getSymbol().getLine() +"): quantidade de parametros passados incompativel com a quantidade de paramentros declarados na funcao");
+				
+				// faz chamada para geração de cogido da chamada de funcao
+				generationOfCode.generationCallFunction(ctx.ID().getText());
+			} else
+				System.out.println("ERRO(linha: "+ ctx.ID().getSymbol().getLine() +"): não corresponde a uma chamada de função");
+		}
+	}
+	
+	public void exitFuncao(JMRCompilerParser.FuncaoContext ctx) {
+		if(ctx.getParent() instanceof ComandosContext) {
+			nameFunction = "";
+			isDeclaredFunction = false;
+		}
 	}
 	
 	private void enterReturnComand(JMRCompilerParser.ComandosContext ctx) {
 		if(isReturn) {
 			int typeFunction = symbolTable.get(nameFunction).getType(), typeBool = Utils.verifyctBoolType(ctx.bool(), this);
+
 			if(typeBool == typeFunction) {
-				if(typeFunction==Utils.INT && typeBool==Utils.FLOAT) {
-					generationOfCode.coercaoIntToFloat();
-				} else {
-					// codigo sem coercao
-				}
+				generationOfCode.generationCodeReturn(typeFunction);
+			} else if((typeBool==Utils.INT) && (typeFunction==Utils.FLOAT)) {
+				// gera coercao e retorna
+				generationOfCode.coercaoIntToFloat();
+				generationOfCode.generationCodeReturn(typeFunction);
 			} else
 				System.out.println("ERRO: tipo de retorno incompativel com o tipo definido na função");
 		} else
-			System.out.println("ERRO: return sendo usado fora do escopo de uma função.");
+			System.out.println("ERRO: return sendo usado fora do escopo de uma funÃ§Ã£o.");
 	}
 	
 	public void enterComandos(JMRCompilerParser.ComandosContext ctx) {
@@ -268,9 +317,7 @@ public class SemanticActions extends JMRCompilerBaseListener {
 			isIfElse = false;
 			generationOfCode.generationSaltoInternoIfElse();
 		} else {
-			if(ctx.getChild(0).getText().equals("return")) {
-				enterReturnComand(ctx); // trata o comando de retorno
-			} else if(ctx.getChild(0).getText().equals("if")) {
+			if(ctx.getChild(0).getText().equals("if")) {
 				if(ctx.getChildCount() >= 8) { // caso seja o comando if_else
 					generationOfCode.generationFinalIfElseCode();
 				} else {
@@ -347,7 +394,7 @@ public class SemanticActions extends JMRCompilerBaseListener {
 			ObjectSymbolTable object = null;
 			
 			// verifica se está em uma função que não se trata do main
-			if(isDeclaredFunction) {
+			if(!isMain && isDeclaredFunction) {
 				Function function = ((Function)symbolTable.get(nameFunction));
 				// verificar se trata-se de um parametro ou variavel local
 				if(function.isDeclaredId(ctx.ID().getText())) {

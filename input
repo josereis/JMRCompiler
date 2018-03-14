@@ -1,14 +1,18 @@
 Class exem;
 Int: a, b;
 
+Int fat(Int x) {
+	if(x<=1) {
+		return 1;
+	} else {
+		return (x*fat(x-1));
+	}
+}
+
 Main {
 	for(a = 1; a < 10 ;a++) {
 		for(b = 1; b < 10; b++){
 			print(b, " ");
-		}
-		print("\n");
-		if(a==2){
-			a = 9;
 		}
 	}
 }

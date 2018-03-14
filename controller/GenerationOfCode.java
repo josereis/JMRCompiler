@@ -349,11 +349,15 @@ public class GenerationOfCode {
 				filePrint.print(typeObject(p.getType()));
 			}
 			filePrint.println(")" + typeObject(function.getType()));
-			filePrint.println("	.limit stack 10\n	.limit locals " + (function.getLocalVariables().size()) + "\n");
+			filePrint.println("	.limit stack 100\n	.limit locals " + (function.getSizeMemoryLocals()) + "\n");
 		}
 	}
 	
-	public void generationFooterFunction(int typeReturn) {
+	public void generationFooterFunction() {
+		filePrint.println(".end method\n");
+	}
+	
+	public void generationCodeReturn(int typeReturn) {
 		filePrint.println("\n");
 		switch (typeReturn) {
 			case Utils.INT: filePrint.println("	ireturn");
@@ -367,7 +371,6 @@ public class GenerationOfCode {
 			default: filePrint.println("	return");
 				break;
 		}
-		filePrint.println(".end method\n");
 	}
 	
 	/**
@@ -656,6 +659,17 @@ public class GenerationOfCode {
 	
 	public void generationBreak() {
 		filePrint.println("	goto LFor" + labelsFor.getTopo() + " ; salta para fora do for (comando break)");		
+	}
+	
+	public void generationCallFunction(String nameFunction) {
+		Function function = (Function) symbolTable.get(nameFunction);
+		if(function != null) {
+			filePrint.print("\n	invokestatic " + programName + "." + nameFunction + "(");
+			for(Parameter p: function.getParameters().values()) {
+				filePrint.print(typeObject(p.getType()));
+			}
+			filePrint.println(")" + typeObject(function.getType()));
+		}
 	}
 	
 	/**
